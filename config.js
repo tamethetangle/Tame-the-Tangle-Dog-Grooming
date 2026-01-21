@@ -28,11 +28,11 @@ const CONFIG = {
     
     // EmailJS (ADD YOUR KEYS)
     emailjs: {
-        publicKey: "YOUR_PUBLIC_KEY",
-        serviceId: "service_xxxxx",
+        publicKey: "CWcEa2jyhbPkl6_Su",
+        serviceId: "service_abc123",
         templates: {
-            confirmation: "template_confirmation",
-            notification: "template_notification",
+            confirmation: "template_igpeyry",
+            notification: "template_3xhhl1m",
             reminder: "template_reminder",
             waitlist: "template_waitlist"
         }
@@ -298,7 +298,7 @@ async function sendNotificationEmail(bookingData) {
             CONFIG.emailjs.templates.notification,
             {
                 ...bookingData,
-                to_email: 'arielthemermaid@gmail.com'
+                to_email: 'tamethetangledoggrooming@gmail.com'
             }
         );
         console.log("Notification email sent!");
