@@ -1,0 +1,15 @@
+{
+  "name": "tame-the-tangle-backend",
+  "version": "1.0.0",
+  "description": "Backend for Tame the Tangle Dog Grooming payment processing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["stripe", "payments", "grooming"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "stripe": "^14.11.0"
+  }
+}

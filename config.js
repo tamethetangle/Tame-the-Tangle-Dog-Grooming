@@ -38,6 +38,7 @@ const CONFIG = {
     
     // Pricing
     pricing: {
+        depositAmount: 30, // Non-refundable deposit
         small: 40,
         medium: 60,
         large: 80,
@@ -54,42 +55,93 @@ const CONFIG = {
 // ============================================
 
 let stripe, cardNumberElement, cardExpiryElement, cardCvcElement;
+let stripeInitialized = false;
 
 // Initialize Stripe
 function initializeStripe() {
-    stripe = Stripe(CONFIG.stripe.publishableKey);
-    const elements = stripe.elements();
-    
-    // Style for all card elements
-    const style = {
-        base: {
-            fontSize: '16px',
-            color: '#32325d',
-            fontFamily: '"Segoe UI", sans-serif',
-            '::placeholder': {
-                color: '#aab7c4'
-            }
-        },
-        invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a'
+    try {
+        console.log('🔧 Initializing Stripe...');
+        
+        if (!window.Stripe) {
+            console.error('❌ Stripe.js not loaded! Check internet connection.');
+            alert('Unable to load payment system. Please refresh the page or check your internet connection.');
+            return false;
         }
-    };
-    
-    // Create separate elements for card number, expiry, and CVC
-    cardNumberElement = elements.create('cardNumber', { style });
-    cardExpiryElement = elements.create('cardExpiry', { style });
-    cardCvcElement = elements.create('cardCvc', { style });
-    
-    // Mount each element to its respective div
-    cardNumberElement.mount('#card-number');
-    cardExpiryElement.mount('#card-expiry');
-    cardCvcElement.mount('#card-cvc');
-    
-    // Add error handling for all elements
-    cardNumberElement.on('change', handleCardChange);
-    cardExpiryElement.on('change', handleCardChange);
-    cardCvcElement.on('change', handleCardChange);
+        
+        stripe = Stripe(CONFIG.stripe.publishableKey);
+        console.log('✅ Stripe object created');
+        
+        const elements = stripe.elements();
+        console.log('✅ Stripe Elements created');
+        
+        // Style for all card elements
+        const style = {
+            base: {
+                fontSize: '16px',
+                color: '#32325d',
+                fontFamily: '"Segoe UI", sans-serif',
+                '::placeholder': {
+                    color: '#aab7c4'
+                },
+                padding: '12px'
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
+        
+        // Create separate elements for card number, expiry, and CVC
+        cardNumberElement = elements.create('cardNumber', { 
+            style: style,
+            showIcon: true
+        });
+        cardExpiryElement = elements.create('cardExpiry', { style: style });
+        cardCvcElement = elements.create('cardCvc', { style: style });
+        
+        console.log('✅ Card elements created');
+        
+        // Check if mounting divs exist
+        const cardNumberDiv = document.getElementById('card-number');
+        const cardExpiryDiv = document.getElementById('card-expiry');
+        const cardCvcDiv = document.getElementById('card-cvc');
+        
+        if (!cardNumberDiv || !cardExpiryDiv || !cardCvcDiv) {
+            console.error('❌ Card element divs not found in DOM!');
+            return false;
+        }
+        
+        console.log('✅ Found all card element divs');
+        
+        // Mount each element to its respective div
+        cardNumberElement.mount('#card-number');
+        console.log('✅ Card number mounted');
+        
+        cardExpiryElement.mount('#card-expiry');
+        console.log('✅ Card expiry mounted');
+        
+        cardCvcElement.mount('#card-cvc');
+        console.log('✅ Card CVC mounted');
+        
+        // Add error handling for all elements
+        cardNumberElement.on('change', handleCardChange);
+        cardExpiryElement.on('change', handleCardChange);
+        cardCvcElement.on('change', handleCardChange);
+        
+        // Add focus event to verify interactivity
+        cardNumberElement.on('focus', () => {
+            console.log('✅ Card number field focused - it\'s working!');
+        });
+        
+        stripeInitialized = true;
+        console.log('✅ Stripe initialization complete!');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Stripe initialization error:', error);
+        alert('Error loading payment system: ' + error.message);
+        return false;
+    }
 }
 
 function handleCardChange(event) {
@@ -103,18 +155,67 @@ function handleCardChange(event) {
     }
 }
 
-// Create payment method (saves card without charging)
-async function createPaymentMethod() {
-    const {paymentMethod, error} = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardNumberElement,
-    });
-    
-    if (error) {
-        throw new Error(error.message);
+// Create payment intent and charge the $30 deposit
+async function createPaymentIntentAndCharge(amount, bookingData) {
+    try {
+        // First, create a payment method with the card details
+        const {paymentMethod, error} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardNumberElement,
+            billing_details: {
+                name: bookingData.ownerName,
+                email: bookingData.email,
+                phone: bookingData.phone
+            }
+        });
+        
+        if (error) {
+            throw new Error(error.message);
+        }
+        
+        console.log('✅ Payment method created:', paymentMethod.id);
+        
+        // Call your backend to actually charge the card
+        const response = await fetch('/.netlify/functions/create-payment-intent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                amount: amount, // Amount in cents (3000 = $30)
+                bookingData: {
+                    paymentMethodId: paymentMethod.id,
+                    ownerName: bookingData.ownerName,
+                    email: bookingData.email,
+                    dogName: bookingData.dogName,
+                    date: bookingData.date,
+                    time: bookingData.time,
+                    estimatedCost: bookingData.estimatedCost
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Payment failed');
+        }
+        
+        const result = await response.json();
+        
+        console.log('✅ Payment successful:', result);
+        
+        return {
+            paymentMethodId: paymentMethod.id,
+            paymentIntentId: result.paymentIntentId,
+            cardLast4: paymentMethod.card.last4,
+            cardBrand: paymentMethod.card.brand,
+            amountCharged: result.amountCharged
+        };
+        
+    } catch (error) {
+        console.error('Payment error:', error);
+        throw error;
     }
-    
-    return paymentMethod;
 }
 
 // ============================================
@@ -204,7 +305,9 @@ async function sendConfirmationEmail(bookingData) {
                 appointment_date: bookingData.date,
                 appointment_time: bookingData.time,
                 duration: bookingData.duration,
-                estimated_cost: bookingData.estimatedCost
+                deposit_paid: bookingData.depositAmount,
+                remaining_balance: bookingData.remainingBalance,
+                total_cost: bookingData.totalCost
             }
         );
         console.log("Confirmation email sent!");
@@ -272,9 +375,14 @@ async function uploadToCloudinary(file) {
 async function handleBooking(event) {
     event.preventDefault();
     
+    if (!stripeInitialized) {
+        alert('Payment system not ready. Please refresh the page and try again.');
+        return;
+    }
+    
     const submitBtn = event.target.querySelector('.submit-btn');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Processing...';
+    submitBtn.textContent = 'Processing Payment...';
     
     try {
         // Get form data
@@ -304,11 +412,17 @@ async function handleBooking(event) {
         if (data.extraTime === 'yes') duration += 1;
         data.duration = duration;
         
-        let cost = CONFIG.pricing[data.size] || 40;
+        let estimatedCost = CONFIG.pricing[data.size] || 40;
         data.addons.forEach(addon => {
-            cost += CONFIG.pricing.addons[addon] || 0;
+            estimatedCost += CONFIG.pricing.addons[addon] || 0;
         });
-        data.estimatedCost = cost;
+        
+        // $30 deposit is PART OF the total, not added to it
+        const depositAmount = CONFIG.pricing.depositAmount;
+        
+        data.estimatedCost = estimatedCost;
+        data.depositAmount = depositAmount;
+        data.balanceDue = estimatedCost - depositAmount; // What they owe at appointment
         
         // Handle first-time client
         if (data.firstTime === 'yes') {
@@ -323,16 +437,23 @@ async function handleBooking(event) {
             }
         }
         
-        // Create Stripe payment method (saves card)
-        const paymentMethod = await createPaymentMethod();
-        data.paymentMethodId = paymentMethod.id;
-        data.cardLast4 = paymentMethod.card.last4;
+        // Charge the $30 deposit immediately
+        submitBtn.textContent = 'Charging $30 deposit...';
+        const paymentResult = await createPaymentIntentAndCharge(depositAmount * 100, data);
+        
+        data.paymentMethodId = paymentResult.paymentMethodId;
+        data.cardLast4 = paymentResult.cardLast4;
+        data.cardBrand = paymentResult.cardBrand;
+        data.depositPaid = true;
+        data.depositChargedAt = new Date().toISOString();
         
         // Save to Firebase
+        submitBtn.textContent = 'Saving booking...';
         const booking = await saveBookingToFirebase(data);
         data.bookingId = booking.id;
         
         // Send emails
+        submitBtn.textContent = 'Sending confirmation...';
         await sendConfirmationEmail(data);
         await sendNotificationEmail(data);
         
@@ -341,17 +462,25 @@ async function handleBooking(event) {
 
 Thank you, ${data.ownerName}!
 
+💳 DEPOSIT CHARGED: $${depositAmount}
+Card: ${data.cardBrand} ending in ${data.cardLast4}
+
 Appointment Details:
 • Dog: ${data.dogName} (${data.breed})
 • Date: ${data.date}
 • Time: ${data.time}
 • Duration: ${duration} hours
-• Estimated Cost: $${cost}
+
+Pricing (Starting Estimate):
+• Estimated Total: $${estimatedCost}
+• Deposit Paid Today: $${depositAmount}
+• Estimated Balance Due: $${data.balanceDue}
+
+⚠️ Final price may vary based on coat condition, matting, and temperament.
+Any adjustments will be discussed before grooming begins.
 
 📧 Confirmation email sent to: ${data.email}
 📱 You'll receive a reminder 24 hours before
-
-💳 Card ending in ${data.cardLast4} is on file for no-show protection
 
 We look forward to pampering ${data.dogName}!`);
         
@@ -366,7 +495,7 @@ We look forward to pampering ${data.dogName}!`);
         
     } catch (error) {
         console.error('Booking error:', error);
-        alert('Error processing booking: ' + error.message + '\n\nPlease try again or call 336-582-2884');
+        alert('Error processing booking: ' + error.message + '\n\nYour card was not charged. Please try again or call 336-582-2884');
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Book Appointment';
@@ -451,21 +580,39 @@ function closeModal() {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Initializing...');
+    console.log('🚀 DOM Content Loaded - Initializing booking system...');
+    console.log('📍 Current URL:', window.location.href);
+    
+    // Check if Stripe.js loaded
+    if (!window.Stripe) {
+        console.error('❌ Stripe.js failed to load from CDN!');
+        alert('Unable to load payment system. Please check your internet connection and refresh the page.');
+        return;
+    }
+    
+    console.log('✅ Stripe.js library loaded');
     
     // Initialize services
-    initializeStripe();
-    initializeFirebase();
-    initializeEmailJS();
+    const stripeOk = initializeStripe();
+    const firebaseOk = initializeFirebase();
+    const emailjsOk = initializeEmailJS();
+    
+    if (!stripeOk) {
+        console.error('❌ Stripe failed to initialize!');
+        document.getElementById('card-errors').textContent = 
+            '⚠️ Payment system unavailable. Please refresh the page.';
+        document.getElementById('card-errors').style.color = '#fa755a';
+    }
     
     // Set minimum date to today
     const dateInput = document.querySelector('input[name="date"]');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
+        console.log('✅ Date picker configured');
     }
     
-    // File upload display (if element exists)
+    // File upload display
     const vacUpload = document.getElementById('vaccinationUpload');
     if (vacUpload) {
         vacUpload.addEventListener('change', function(e) {
@@ -475,10 +622,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileNameDisplay.textContent = '✓ Uploaded: ' + fileName;
             }
         });
+        console.log('✅ File upload handler attached');
     }
     
-    console.log('✅ Booking system initialized!');
-    console.log('✅ Stripe: Ready (separate card fields)');
-    console.log('   Firebase:', db ? 'Ready' : 'Not configured');
-    console.log('   EmailJS:', emailjs ? 'Ready' : 'Not configured');
+    console.log('\n═══════════════════════════════════════');
+    console.log('📊 INITIALIZATION SUMMARY:');
+    console.log('═══════════════════════════════════════');
+    console.log('✅ Stripe:', stripeOk ? 'Ready (with $30 deposit)' : '❌ Failed');
+    console.log('   Firebase:', firebaseOk ? 'Ready' : 'Not configured');
+    console.log('   EmailJS:', emailjsOk ? 'Ready' : 'Not configured');
+    console.log('═══════════════════════════════════════\n');
+    
+    // Test card field interactivity after a short delay
+    setTimeout(() => {
+        const cardNumberDiv = document.getElementById('card-number');
+        if (cardNumberDiv) {
+            const iframe = cardNumberDiv.querySelector('iframe');
+            if (iframe) {
+                console.log('✅ Stripe iframe detected in card-number div');
+            } else {
+                console.warn('⚠️ No iframe found in card-number div - Stripe may not have mounted correctly');
+            }
+        }
+    }, 1000);
 });
