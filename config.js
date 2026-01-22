@@ -455,7 +455,7 @@ We look forward to pampering ${data.dogName}!`);
         if (cardExpiryElement) cardExpiryElement.clear();
         if (cardCvcElement) cardCvcElement.clear();
         
-        document.getElementById('waiverSection')?.style.display = 'none';
+        const waiverSection = document.getElementById('waiverSection');
         
     } catch (error) {
         console.error('Booking error:', error);
@@ -508,7 +508,7 @@ async function handleReview(event) {
 
 function toggleWaiverSection() {
     const firstTime = document.getElementById('firstTimeSelect')?.value;
-    const waiverSection = document.getElementById('waiverSection');
+   const firstTimeSelect = document.getElementById('firstTimeSelect');
     const vaccinationUpload = document.getElementById('vaccinationUpload');
     const agreeWaiverCheck = document.getElementById('agreeWaiverCheck');
     
@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const vacUpload = document.getElementById('vaccinationUpload');
     if (vacUpload) {
         vacUpload.addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name;
+            const fileName = e.target.files[0] ? e.target.files[0].name : null;
             const fileNameDisplay = document.getElementById('fileName');
             if (fileName && fileNameDisplay) {
                 fileNameDisplay.textContent = '✓ Uploaded: ' + fileName;
