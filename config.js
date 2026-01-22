@@ -16,16 +16,6 @@ const CONFIG = {
             : 'https://your-server-url-here.com'  // Production - UPDATE THIS!
     },
     
-    // Firebase (ADD YOUR KEYS)
-    firebase: {
-        apiKey: "YOUR_FIREBASE_API_KEY",
-        authDomain: "your-project.firebaseapp.com",
-        projectId: "your-project-id",
-        storageBucket: "your-project.appspot.com",
-        messagingSenderId: "123456789",
-        appId: "YOUR_APP_ID"
-    },
-    
     // EmailJS (ADD YOUR KEYS)
     emailjs: {
         publicKey: "CWcEa2jyhbPkl6_Su",
@@ -36,12 +26,6 @@ const CONFIG = {
             reminder: "template_reminder",
             waitlist: "template_waitlist"
         }
-    },
-    
-    // Cloudinary (ADD YOUR KEYS)
-    cloudinary: {
-        cloudName: "your-cloud-name",
-        uploadPreset: "tame_the_tangle_vaccinations"
     },
     
     // Pricing
