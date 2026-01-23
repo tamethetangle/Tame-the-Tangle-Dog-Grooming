@@ -78,6 +78,19 @@
             margin-top: 60px;
         }
 
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            width: 300px;
+            max-width: 90%;
+            height: auto;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -88,6 +101,18 @@
             font-size: 1.3rem;
             margin-bottom: 2rem;
             animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            height: 200px;
+            width: auto;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
         }
 
         .cta-button {
@@ -438,6 +463,18 @@
         }
 
         @media (max-width: 768px) {
+            .hero {
+                padding: 80px 1rem 60px;
+                margin-top: 60px;
+            }
+
+            .hero-logo {
+                width: 200px;
+                max-width: 80%;
+                height: auto;
+                margin-bottom: 1.5rem;
+            }
+
             .hero h1 {
                 font-size: 2rem;
             }
@@ -802,7 +839,7 @@
     <span class="contact-icon">📧</span>
     <div>
         <strong>Email</strong><br>
-        <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#2652474b43524e43524748414a43424941415449494b4f484166414b474f4a0845494b"><span class="__cf_email__" data-cfemail="a4d0c5c9c1d0ccc1d0c5cac3c8c1c0cbc3c3d6cbcbc9cdcac3e4c3c9c5cdc88ac7cbc9">[email&#160;protected]</span></a>
     </div>
 </div>
                     <div class="contact-item">
@@ -838,7 +875,7 @@
     </footer>
 
     <!-- Time slot management and waiver toggle -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Update available time slots based on selected date
         function updateAvailableTimes() {
             const dateInput = document.getElementById('appointmentDate');
@@ -917,13 +954,4 @@
             // Set minimum date to today
             const dateInput = document.getElementById('appointmentDate');
             if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
-            }
-        });
-    </script>
-
-    <!-- CRITICAL: This loads your payment system! -->
-    <script src="config.js"></script>
-</body>
-</html>
+ 
