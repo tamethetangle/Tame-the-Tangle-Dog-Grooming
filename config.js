@@ -5,15 +5,23 @@
 const CONFIG = {
     // Stripe (READY TO USE)
     stripe: {
-        publishableKey: 'pk_test_51Sm3Mm6CQjAUzRawX9ObAubSCQlEBtRaVtSKHGa6wRRqZ4RFPx17VYFg4b3ZsHs01j2kPhu7nVkceuNayjh2Xkwj00xwOE8ceK'
+        publishableKey: 'pk_live_51Sm3Md7IUpwHpZ4wAZeVYeDJ2t8DFKHFnZAiNccEuIf300wp6lEfHlxYas62UdgSwXPq7oWEWVPPD2iujVL1lqww006J76MpI2'
     },
     
     // Backend API URL
-    // IMPORTANT: Update this to your server's public URL when deploying!
     api: {
-        baseUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:3000'  // Local development
-            : 'https://your-server-url-here.com'  // Production - UPDATE THIS!
+        baseUrl: 'https://tame-the-tangle-dog-grooming.onrender.com'  // For local testing
+        // When ready for production, change to: 'https://your-production-backend.com'
+    },
+    
+    // Firebase (ADD YOUR KEYS)
+    firebase: {
+        apiKey: "YOUR_FIREBASE_API_KEY",
+        authDomain: "your-project.firebaseapp.com",
+        projectId: "your-project-id",
+        storageBucket: "your-project.appspot.com",
+        messagingSenderId: "123456789",
+        appId: "YOUR_APP_ID"
     },
     
     // EmailJS (ADD YOUR KEYS)
@@ -26,6 +34,12 @@ const CONFIG = {
             reminder: "template_reminder",
             waitlist: "template_waitlist"
         }
+    },
+    
+    // Cloudinary (ADD YOUR KEYS)
+    cloudinary: {
+        cloudName: "your-cloud-name",
+        uploadPreset: "tame_the_tangle_vaccinations"
     },
     
     // Pricing

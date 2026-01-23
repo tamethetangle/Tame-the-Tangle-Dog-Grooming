@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://getlaunchlist.com/js/widget.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tame the Tangle Dog Grooming -  Tame the Tangle Dog Grooming Services</title>
+    <title>Tame the Tangle Dog Grooming - Professional Dog Grooming Services</title>
     
     <!-- Stripe.js -->
     <script src="https://js.stripe.com/v3/"></script>
@@ -51,7 +50,7 @@
         }
 
         .logo img {
-            height: 100px;
+            height: 200px;
             width: auto;
         }
 
@@ -453,7 +452,7 @@
             }
 
             .logo img {
-                height: 100px;
+                height: 120px;
             }
 
             .form-row {
@@ -488,7 +487,7 @@
     </header>
 
     <section id="home" class="hero">
-        <h1>Tame the Tangle Dog Grooming Services</h1>
+        <h1>Professional Dog Grooming Services</h1>
         <p>Where Every Pup Gets the Royal Treatment</p>
         <a href="#booking" class="cta-button">Book Appointment</a>
     </section>
@@ -676,11 +675,18 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Preferred Date *</label>
-                        <input type="date" name="date" required>
+                        <input type="date" name="date" id="appointmentDate" required onchange="updateAvailableTimes()">
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                            Hours: Mon-Fri 5pm-7pm | Sat 9am-7pm | Sun Closed
+                        </p>
                     </div>
                     <div class="form-group">
-                        <label>Preferred Time *</label>
-                        <input type="time" name="time" required>
+                        <label>Preferred Time * </label>
+                        <select name="time" id="appointmentTime" required>
+                            <option value="">Select a date first</option>
+                        </select>
+                        <p id="timeNote" style="font-size: 0.85rem; color: #dc3545; margin-top: 0.5rem; display: none;">
+                        </p>
                     </div>
                 </div>
 
@@ -703,6 +709,37 @@
                 <div class="form-group">
                     <label>Special Notes</label>
                     <textarea name="notes" rows="3" placeholder="Any behavioral issues, health conditions, or special requests..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="returningClient" name="returningClient" onchange="toggleWaiverRequirement()">
+                        <span>I'm a returning client</span>
+                    </label>
+                </div>
+
+                <div id="waiverRequirement" class="form-group" style="background: #fff3cd; padding: 1rem; border-radius: 8px; border: 2px solid #ffc107;">
+                    <p style="margin: 0 0 0.5rem 0; font-weight: bold; color: #856404;">
+                        ⚠️ New Client Waiver Required
+                    </p>
+                    <p style="margin: 0 0 1rem 0; color: #856404; font-size: 0.9rem;">
+                        All first-time clients must complete our waiver form before booking. This only takes 2-3 minutes.
+                    </p>
+                    <a href="https://forms.zoho.com/tamethetangledoggrooming1/form/TametheTangleGroomingWaiver" 
+                       target="_blank" 
+                       style="display: inline-block; background: #00796b; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                        📋 Complete Waiver Form (Opens in New Tab)
+                    </a>
+                    <p style="margin: 1rem 0 0 0; font-size: 0.85rem; color: #856404;">
+                        After completing the waiver, return here to finish your booking.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="waiverCompleted" name="waiverCompleted" required>
+                        <span>I have completed the waiver form (required for new clients) *</span>
+                    </label>
                 </div>
 
                 <div class="form-group">
@@ -730,9 +767,21 @@
 
                 <button type="submit" class="submit-btn">Book Appointment</button>
             </form>
+
+            <!-- Waitlist Notice -->
+            <div style="background: #e3f2fd; padding: 2rem; border-radius: 12px; margin-top: 3rem; text-align: center; border: 2px solid #2196f3;">
+                <h3 style="color: #1976d2; margin-bottom: 1rem;">📋 Can't Find an Available Time?</h3>
+                <p style="color: #0d47a1; margin-bottom: 1.5rem;">
+                    Join our waitlist! I'll notify you when spots open up or if there are any cancellations.
+                </p>
+                <a href="mailto:tamethetangledoggrooming@gmail.com?subject=Waitlist Request&body=Please add me to your waitlist!%0A%0AName:%0APhone:%0ADog Name:%0APreferred Days/Times:" 
+                   style="display: inline-block; background: #2196f3; color: white; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                    📧 Join the Waitlist
+                </a>
+            </div>
         </div>
     </section>
-<div class="launchlist-widget" data-key-id="1eoRkJ" data-height="180px"></div>
+
     <section id="contact" class="contact">
         <div class="container">
             <h2 class="section-title">Contact Information</h2>
@@ -749,7 +798,7 @@
     <span class="contact-icon">📧</span>
     <div>
         <strong>Email</strong><br>
-        <a href="/cdn-cgi/l/email-protection#2155404c4455494455404f464d44454e4646534e4e4c484f4661464c40484d0f424e4c"><span class="__cf_email__" data-cfemail="5420353931203c3120353a333831303b3333263b3b393d3a33143339353d387a373b39">[email&#160;protected]</span></a>
+        <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
     </div>
 </div>
                     <div class="contact-item">
@@ -783,6 +832,92 @@
     <footer>
         <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
     </footer>
+
+    <!-- Time slot management and waiver toggle -->
+    <script>
+        // Update available time slots based on selected date
+        function updateAvailableTimes() {
+            const dateInput = document.getElementById('appointmentDate');
+            const timeSelect = document.getElementById('appointmentTime');
+            const timeNote = document.getElementById('timeNote');
+            
+            if (!dateInput.value) {
+                timeSelect.innerHTML = '<option value="">Select a date first</option>';
+                return;
+            }
+            
+            const selectedDate = new Date(dateInput.value + 'T00:00:00');
+            const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+            
+            let times = [];
+            let note = '';
+            
+            // Sunday - Closed
+            if (dayOfWeek === 0) {
+                timeSelect.innerHTML = '<option value="">Closed on Sundays</option>';
+                timeNote.textContent = '❌ We are closed on Sundays. Please select another day.';
+                timeNote.style.display = 'block';
+                return;
+            }
+            
+            // Monday-Friday: 5pm - 7pm
+            else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                times = ['17:00', '18:00', '19:00'];
+                note = 'Mon-Fri hours: 5:00 PM - 7:00 PM';
+            }
+            
+            // Saturday: 9am - 7pm (last booking at 5pm)
+            else if (dayOfWeek === 6) {
+                times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+                note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
+            }
+            
+            // Populate time options
+            timeSelect.innerHTML = '<option value="">Select a time</option>';
+            times.forEach(time => {
+                const option = document.createElement('option');
+                option.value = time;
+                const [hours, minutes] = time.split(':');
+                const hour12 = hours % 12 || 12;
+                const ampm = hours < 12 ? 'AM' : 'PM';
+                option.textContent = `${hour12}:${minutes} ${ampm}`;
+                timeSelect.appendChild(option);
+            });
+            
+            timeNote.textContent = note;
+            timeNote.style.color = '#00796b';
+            timeNote.style.display = 'block';
+        }
+        
+        // Toggle waiver requirement based on returning client checkbox
+        function toggleWaiverRequirement() {
+            const returningCheckbox = document.getElementById('returningClient');
+            const waiverRequirement = document.getElementById('waiverRequirement');
+            const waiverCompleted = document.getElementById('waiverCompleted');
+            
+            if (returningCheckbox.checked) {
+                // Returning client - hide waiver requirement
+                waiverRequirement.style.display = 'none';
+                waiverCompleted.required = false;
+                waiverCompleted.checked = true;
+            } else {
+                // New client - show waiver requirement
+                waiverRequirement.style.display = 'block';
+                waiverCompleted.required = true;
+                waiverCompleted.checked = false;
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+    </script>
 
     <!-- CRITICAL: This loads your payment system! -->
     <script src="config.js"></script>
