@@ -500,7 +500,8 @@ async function handleReview(event) {
 // ============================================
 
 function toggleWaiverSection() {
-    const firstTime = document.getElementById('firstTimeSelect')?.value;
+    const firstTimeSelect = document.getElementById('firstTimeSelect');
+const firstTime = firstTimeSelect ? firstTimeSelect.value : null;
    const firstTimeSelect = document.getElementById('firstTimeSelect');
     const vaccinationUpload = document.getElementById('vaccinationUpload');
     const agreeWaiverCheck = document.getElementById('agreeWaiverCheck');
