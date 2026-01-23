@@ -10,7 +10,7 @@ const CONFIG = {
     
     // Backend API URL
     api: {
-        baseUrl: 'https://tame-the-tangle-dog-grooming.onrender.com'  // For local testing
+        baseUrl: 'https://tame-the-tangle-backend.onrender.com'  // For local testing
         // When ready for production, change to: 'https://your-production-backend.com'
     },
     
