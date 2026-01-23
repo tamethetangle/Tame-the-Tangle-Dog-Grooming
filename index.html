@@ -907,5 +907,18 @@
             }
         }
         
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', fun
+       // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+    </script>
+
+    <!-- CRITICAL: This loads your payment system! -->
+    <script src="config.js"></script>
+</body>
+</html>
