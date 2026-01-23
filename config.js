@@ -16,12 +16,12 @@ const CONFIG = {
     
     // Firebase (ADD YOUR KEYS)
     firebase: {
-        apiKey: "YOUR_FIREBASE_API_KEY",
-        authDomain: "your-project.firebaseapp.com",
-        projectId: "your-project-id",
-        storageBucket: "your-project.appspot.com",
-        messagingSenderId: "123456789",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyDKEm1AnfJn7ovvDLvVMl9shmSLL-PUUAo",
+        authDomain: "tame-the-tangle-booking.firebaseapp.com",
+        projectId: "tame-the-tangle-booking",
+        storageBucket: "tame-the-tangle-booking.firebasestorage.app",
+        messagingSenderId: "109713070835",
+        appId: "G-D0W52DCFVF"
     },
     
     // EmailJS (ADD YOUR KEYS)
@@ -36,11 +36,6 @@ const CONFIG = {
         }
     },
     
-    // Cloudinary (ADD YOUR KEYS)
-    cloudinary: {
-        cloudName: "your-cloud-name",
-        uploadPreset: "tame_the_tangle_vaccinations"
-    },
     
     // Pricing
     pricing: {
