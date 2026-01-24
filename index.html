@@ -1158,6 +1158,7 @@
             </div>
         </div>
     </section>
+    </section>
 
     <section id="contact" class="contact">
         <div class="container">
@@ -1171,23 +1172,13 @@
                             336-582-2884 (Hope Ariel)
                         </div>
                     </div>
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
-            }
-        });
-    </script>
-
-    <!-- CRITICAL: This loads your payment system! -->
-    <script src="config.js"></script>
-</body>
-</html>
                    <div class="contact-item">
-    <span class="contact-icon">📧</span>
-    <div>
-        <strong>Email</strong><br>
-        <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
-    </div>
-</div>
+                        <span class="contact-icon">📧</span>
+                        <div>
+                            <strong>Email</strong><br>
+                            <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+                        </div>
+                    </div>
                     <div class="contact-item">
                         <span class="contact-icon">📍</span>
                         <div>
@@ -1221,7 +1212,7 @@
     </footer>
 
     <!-- Time slot management and waiver toggle -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // Update available time slots based on selected date
         function updateAvailableTimes() {
             const dateInput = document.getElementById('appointmentDate');
@@ -1234,32 +1225,26 @@
             }
             
             const selectedDate = new Date(dateInput.value + 'T00:00:00');
-            const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+            const dayOfWeek = selectedDate.getDay();
             
             let times = [];
             let note = '';
             
-            // Sunday - Closed
             if (dayOfWeek === 0) {
                 timeSelect.innerHTML = '<option value="">Closed on Sundays</option>';
                 timeNote.textContent = '❌ We are closed on Sundays. Please select another day.';
                 timeNote.style.display = 'block';
                 return;
             }
-            
-            // Monday-Friday: 5pm - 7pm
             else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
                 times = ['17:00', '18:00', '19:00'];
                 note = 'Mon-Fri hours: 5:00 PM - 7:00 PM';
             }
-            
-            // Saturday: 9am - 7pm (last booking at 5pm)
             else if (dayOfWeek === 6) {
                 times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
                 note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
             }
             
-            // Populate time options
             timeSelect.innerHTML = '<option value="">Select a time</option>';
             times.forEach(time => {
                 const option = document.createElement('option');
@@ -1276,24 +1261,25 @@
             timeNote.style.display = 'block';
         }
         
-        // Toggle waiver requirement based on returning client checkbox
         function toggleWaiverRequirement() {
             const returningCheckbox = document.getElementById('returningClient');
             const waiverRequirement = document.getElementById('waiverRequirement');
             const waiverCompleted = document.getElementById('waiverCompleted');
             
             if (returningCheckbox.checked) {
-                // Returning client - hide waiver requirement
                 waiverRequirement.style.display = 'none';
                 waiverCompleted.required = false;
                 waiverCompleted.checked = true;
             } else {
-                // New client - show waiver requirement
                 waiverRequirement.style.display = 'block';
                 waiverCompleted.required = true;
                 waiverCompleted.checked = false;
             }
         }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
                 const today = new Date().toISOString().split('T')[0];
                 dateInput.setAttribute('min', today);
             }
