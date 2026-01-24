@@ -564,3 +564,192 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Booking system ready!');
     console.log('Backend URL:', CONFIG.api.baseUrl);
 });
+
+// ============================================
+// BOOKING CALENDAR SYSTEM
+// ============================================
+
+// Calendar state
+let currentCalendarDate = new Date();
+let selectedDate = null;
+let bookedDates = [];
+let blockedDates = [];
+
+// MANUALLY BLOCK DATES - Add your vacation/holiday dates here
+const MANUALLY_BLOCKED_DATES = [
+    // Example: '2026-02-14',  // Valentine's Day
+    // Add your dates in YYYY-MM-DD format
+];
+
+// Maximum bookings per day (adjust based on your capacity)
+const MAX_BOOKINGS_PER_DAY = 3;
+
+// Load booked dates from Firebase
+async function loadBookedDates() {
+    try {
+        if (!db) {
+            console.log('Firebase not configured, using manual blocked dates only');
+            blockedDates = [...MANUALLY_BLOCKED_DATES];
+            renderCalendar();
+            return;
+        }
+        
+        const bookingsRef = collection(db, 'bookings');
+        const snapshot = await getDocs(bookingsRef);
+        
+        bookedDates = [];
+        const dateCount = {};
+        
+        snapshot.forEach((doc) => {
+            const booking = doc.data();
+            const date = booking.date;
+            dateCount[date] = (dateCount[date] || 0) + 1;
+            
+            // If max bookings reached, mark as booked
+            if (dateCount[date] >= MAX_BOOKINGS_PER_DAY) {
+                if (!bookedDates.includes(date)) {
+                    bookedDates.push(date);
+                }
+            }
+        });
+        
+        // Check for manually blocked dates in Firebase
+        try {
+            const blockedRef = collection(db, 'blocked-dates');
+            const blockedSnapshot = await getDocs(blockedRef);
+            const firebaseBlocked = [];
+            blockedSnapshot.forEach((doc) => {
+                firebaseBlocked.push(doc.data().date);
+            });
+            blockedDates = [...MANUALLY_BLOCKED_DATES, ...firebaseBlocked];
+        } catch (error) {
+            console.log('No blocked-dates collection yet, using manual only');
+            blockedDates = [...MANUALLY_BLOCKED_DATES];
+        }
+        
+        renderCalendar();
+        
+    } catch (error) {
+        console.error('Error loading booked dates:', error);
+        blockedDates = [...MANUALLY_BLOCKED_DATES];
+        renderCalendar();
+    }
+}
+
+// Render the calendar
+function renderCalendar() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    const calendarMonth = document.getElementById('calendarMonth');
+    if (calendarMonth) {
+        calendarMonth.textContent = `${monthNames[month]} ${year}`;
+    }
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let html = '';
+    
+    // Empty cells before month starts
+    for (let i = 0; i < firstDay; i++) {
+        html += '<div class="calendar-day empty"></div>';
+    }
+    
+    // Days of month
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        date.setHours(0, 0, 0, 0);
+        const dateString = formatDate(date);
+        
+        let classes = ['calendar-day'];
+        let clickable = true;
+        
+        // Check if past
+        if (date < today) {
+            classes.push('past');
+            clickable = false;
+        } else if (date.getTime() === today.getTime()) {
+            classes.push('today');
+        }
+        
+        // Check if Sunday (closed)
+        if (date.getDay() === 0 && date >= today) {
+            classes.push('booked');
+            clickable = false;
+        }
+        // Check if booked or blocked
+        else if (bookedDates.includes(dateString) || blockedDates.includes(dateString)) {
+            classes.push('booked');
+            clickable = false;
+        } else if (date >= today) {
+            classes.push('available');
+        }
+        
+        // Check if selected
+        if (selectedDate === dateString) {
+            classes.push('selected');
+        }
+        
+        const onclick = clickable ? `onclick="selectDate('${dateString}')"` : '';
+        html += `<div class="${classes.join(' ')}" ${onclick}>${day}</div>`;
+    }
+    
+    const calendarDays = document.getElementById('calendarDays');
+    if (calendarDays) {
+        calendarDays.innerHTML = html;
+    }
+}
+
+// Select a date from calendar
+function selectDate(dateString) {
+    selectedDate = dateString;
+    
+    const dateInput = document.getElementById('appointmentDate');
+    if (dateInput) {
+        dateInput.value = dateString;
+        updateAvailableTimes();
+    }
+    
+    renderCalendar();
+}
+
+// Navigate months
+function previousMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar();
+}
+
+// Format date helper
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Initialize calendar on page load
+setTimeout(function() {
+    console.log('📅 Initializing booking calendar...');
+    renderCalendar();
+    
+    if (typeof db !== 'undefined' && db) {
+        loadBookedDates();
+        // Refresh every 5 minutes
+        setInterval(loadBookedDates, 5 * 60 * 1000);
+    } else {
+        console.log('Using calendar without Firebase integration');
+    }
+}, 1000); // Wait 1 second for Firebase to initialize
+

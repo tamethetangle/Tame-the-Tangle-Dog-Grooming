@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tame the Tangle</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: white; text-align: center; margin-bottom: 2rem; font-size: 2.5rem; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .stat-number { font-size: 2.5rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; margin-top: 0.5rem; font-size: 0.9rem; }
+        .admin-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .admin-card h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.75rem;
+        }
+        .bookings-list { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
+        .booking-item {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        .booking-date { font-weight: bold; color: #667eea; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .booking-details { color: #666; font-size: 0.95rem; line-height: 1.6; }
+        .block-date-form { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .block-date-form input {
+            flex: 1;
+            padding: 0.875rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        .block-date-form button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .blocked-dates-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .blocked-date-tag {
+            background: #ffebee;
+            color: #c62828;
+            padding: 0.75rem 1.25rem;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .blocked-date-tag button {
+            background: #c62828;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .loading, .no-data { text-align: center; color: #999; padding: 2rem; }
+        @media (max-width: 968px) {
+            .admin-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐕 Admin Dashboard</h1>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">-</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="upcomingBookings">-</div>
+                <div class="stat-label">Upcoming</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todayBookings">-</div>
+                <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="blockedDatesCount">-</div>
+                <div class="stat-label">Blocked Dates</div>
+            </div>
+        </div>
+        <div class="admin-grid">
+            <div class="admin-card">
+                <h2>📅 Upcoming Bookings</h2>
+                <div class="bookings-list" id="bookingsList">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <h2>🚫 Block Dates</h2>
+                <div class="block-date-form">
+                    <input type="date" id="blockDateInput">
+                    <button onclick="blockDate()">Block</button>
+                </div>
+                <div class="blocked-dates-list" id="blockedDatesList">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        const app = initializeApp({
+            apiKey: "AIzaSyDKEm1AnfJn7ovvDLvVMl9shmSLL-PUUAo",
+            authDomain: "tame-the-tangle-booking.firebaseapp.com",
+            projectId: "tame-the-tangle-booking",
+            storageBucket: "tame-the-tangle-booking.firebasestorage.app",
+            messagingSenderId: "109713070835",
+            appId: "G-D0W52DCFVF"
+        });
+        const db = getFirestore(app);
+        
+        async function loadBookings() {
+            try {
+                const q = query(collection(db, 'bookings'), orderBy('date', 'asc'));
+                const snapshot = await getDocs(q);
+                const upcoming = [], today = new Date();
+                today.setHours(0,0,0,0);
+                let todayCount = 0;
+                
+                snapshot.forEach((d) => {
+                    const b = { id: d.id, ...d.data() };
+                    const bd = new Date(b.date + 'T00:00:00');
+                    if (bd >= today) upcoming.push(b);
+                    if (b.date === today.toISOString().split('T')[0]) todayCount++;
+                });
+                
+                document.getElementById('totalBookings').textContent = snapshot.size;
+                document.getElementById('upcomingBookings').textContent = upcoming.length;
+                document.getElementById('todayBookings').textContent = todayCount;
+                
+                document.getElementById('bookingsList').innerHTML = upcoming.length ? upcoming.map(b => `
+                    <div class="booking-item">
+                        <div class="booking-date">📅 ${new Date(b.date+'T00:00').toLocaleDateString()} @ ${b.time}</div>
+                        <div class="booking-details">
+                            <strong>${b.ownerName}</strong> - ${b.dogName} (${b.breed})<br>
+                            📱 ${b.phone} | 📧 ${b.email}<br>
+                            💰 $${b.estimatedCost} (Deposit: $${b.depositAmount})
+                            ${b.notes ? '<br>📝 '+b.notes : ''}
+                        </div>
+                    </div>
+                `).join('') : '<div class="no-data">No upcoming bookings</div>';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('bookingsList').innerHTML = '<div class="no-data">Error loading</div>';
+            }
+        }
+        
+        async function loadBlockedDates() {
+            try {
+                const snapshot = await getDocs(collection(db, 'blocked-dates'));
+                const blocked = [];
+                snapshot.forEach(d => blocked.push({ id: d.id, ...d.data() }));
+                
+                document.getElementById('blockedDatesCount').textContent = blocked.length;
+                document.getElementById('blockedDatesList').innerHTML = blocked.length ? blocked
+                    .sort((a,b) => a.date.localeCompare(b.date))
+                    .map(item => `
+                        <div class="blocked-date-tag">
+                            ${new Date(item.date+'T00:00').toLocaleDateString()}
+                            <button onclick="window.unblockDate('${item.id}')">×</button>
+                        </div>
+                    `).join('') : '<div class="no-data">None</div>';
+            } catch (e) {
+                document.getElementById('blockedDatesCount').textContent = '0';
+                document.getElementById('blockedDatesList').innerHTML = '<div class="no-data">None</div>';
+            }
+        }
+        
+        window.blockDate = async function() {
+            const date = document.getElementById('blockDateInput').value;
+            if (!date) return alert('Select a date');
+            try {
+                await addDoc(collection(db, 'blocked-dates'), { date, blockedAt: new Date().toISOString() });
+                document.getElementById('blockDateInput').value = '';
+                loadBlockedDates();
+                alert('✅ Date blocked');
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+        
+        window.unblockDate = async function(id) {
+            if (!confirm('Unblock this date?')) return;
+            try {
+                await deleteDoc(doc(db, 'blocked-dates', id));
+                loadBlockedDates();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        };
+        
+        loadBookings();
+        loadBlockedDates();
+        setInterval(() => { loadBookings(); loadBlockedDates(); }, 30000);
+        document.getElementById('blockDateInput').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
