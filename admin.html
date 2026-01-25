@@ -4,93 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Tame the Tangle</title>
+    <link rel="icon" type="image/png" href="Pup_spa.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #a78bfa 100%);
             min-height: 100vh;
+            padding: 2rem;
         }
         .container { max-width: 1400px; margin: 0 auto; }
-        h1 { color: white; text-align: center; margin-bottom: 2rem; font-size: 2.5rem; }
-        .stats {
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .admin-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
             margin-bottom: 2rem;
         }
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .stat-number { font-size: 2.5rem; font-weight: bold; color: #667eea; }
-        .stat-label { color: #666; margin-top: 0.5rem; font-size: 0.9rem; }
-        .admin-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
         .admin-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
         .admin-card h2 {
-            color: #667eea;
+            color: #00796b;
             margin-bottom: 1.5rem;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #00796b;
             padding-bottom: 0.75rem;
         }
-        .bookings-list { max-height: 600px; overflow-y: auto; padding-right: 0.5rem; }
+        .bookings-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
         .booking-item {
             background: #f8f9fa;
             padding: 1.25rem;
             margin-bottom: 1rem;
-            border-radius: 10px;
-            border-left: 5px solid #667eea;
+            border-radius: 12px;
+            border-left: 5px solid #00796b;
         }
-        .booking-date { font-weight: bold; color: #667eea; font-size: 1.2rem; margin-bottom: 0.5rem; }
-        .booking-details { color: #666; font-size: 0.95rem; line-height: 1.6; }
-        .block-date-form { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .block-date-form input {
+        .booking-date {
+            font-weight: bold;
+            color: #00796b;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .booking-details {
+            margin-top: 0.75rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        .block-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        .form-row input, .form-row select {
             flex: 1;
+        }
+        input, select {
+            width: 100%;
             padding: 0.875rem;
-            border: 2px solid #ddd;
+            border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1rem;
         }
-        .block-date-form button {
-            background: #667eea;
+        button {
+            background: #00796b;
             color: white;
             border: none;
             padding: 0.875rem 2rem;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
+            width: 100%;
+            margin-top: 1rem;
         }
-        .blocked-dates-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-        .blocked-date-tag {
+        button:hover {
+            background: #005a4d;
+        }
+        .blocked-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .blocked-item {
             background: #ffebee;
-            color: #c62828;
-            padding: 0.75rem 1.25rem;
-            border-radius: 25px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 10px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 0.75rem;
+            border-left: 4px solid #c62828;
         }
-        .blocked-date-tag button {
+        .blocked-item-info {
+            flex: 1;
+        }
+        .blocked-item-date {
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 0.25rem;
+        }
+        .blocked-item-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .delete-btn {
             background: #c62828;
             color: white;
             border: none;
-            width: 24px;
-            height: 24px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
         }
-        .loading, .no-data { text-align: center; color: #999; padding: 2rem; }
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 0.75rem;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+        }
         @media (max-width: 968px) {
             .admin-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -99,45 +185,77 @@
         <h1>🐕 Admin Dashboard</h1>
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number" id="totalBookings">-</div>
+                <div class="stat-number" id="totalBookings">0</div>
                 <div class="stat-label">Total Bookings</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="upcomingBookings">-</div>
+                <div class="stat-number" id="upcomingBookings">0</div>
                 <div class="stat-label">Upcoming</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="todayBookings">-</div>
-                <div class="stat-label">Today</div>
+                <div class="stat-number" id="blockedDatesCount">0</div>
+                <div class="stat-label">Blocked Dates</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="blockedDatesCount">-</div>
-                <div class="stat-label">Blocked Dates</div>
+                <div class="stat-number" id="blockedTimesCount">0</div>
+                <div class="stat-label">Blocked Times</div>
             </div>
         </div>
         <div class="admin-grid">
             <div class="admin-card">
                 <h2>📅 Upcoming Bookings</h2>
-                <div class="bookings-list" id="bookingsList">
-                    <div class="loading">Loading...</div>
-                </div>
+                <div class="bookings-list" id="bookingsList">Loading...</div>
             </div>
             <div class="admin-card">
-                <h2>🚫 Block Dates</h2>
-                <div class="block-date-form">
-                    <input type="date" id="blockDateInput">
-                    <button onclick="blockDate()">Block</button>
+                <h2>🚫 Block Dates & Times</h2>
+                
+                <div class="info-box">
+                    💡 <strong>Block entire days</strong> (vacation, holidays) or <strong>specific time slots</strong> (appointments, personal time)
                 </div>
-                <div class="blocked-dates-list" id="blockedDatesList">
-                    <div class="loading">Loading...</div>
+
+                <div class="block-form">
+                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Entire Day</h3>
+                    <div class="form-group">
+                        <label>Select Date:</label>
+                        <input type="date" id="blockWholeDay">
+                    </div>
+                    <button onclick="blockWholeDay()">🚫 Block Entire Day</button>
                 </div>
+
+                <div class="block-form">
+                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Specific Time</h3>
+                    <div class="form-group">
+                        <label>Select Date:</label>
+                        <input type="date" id="blockTimeDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Time:</label>
+                        <select id="blockTimeSlot">
+                            <option value="">Choose a time...</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                            <option value="17:00">5:00 PM</option>
+                            <option value="18:00">6:00 PM</option>
+                            <option value="19:00">7:00 PM</option>
+                        </select>
+                    </div>
+                    <button onclick="blockSpecificTime()">⏰ Block This Time</button>
+                </div>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: #00796b;">Currently Blocked:</h3>
+                <div class="blocked-list" id="blockedList">Loading...</div>
             </div>
         </div>
     </div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const app = initializeApp({
             apiKey: "AIzaSyDKEm1AnfJn7ovvDLvVMl9shmSLL-PUUAo",
             authDomain: "tame-the-tangle-booking.firebaseapp.com",
@@ -148,28 +266,26 @@
         });
         const db = getFirestore(app);
         
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('blockWholeDay').min = today;
+        document.getElementById('blockTimeDate').min = today;
+        
         async function loadBookings() {
             try {
                 const q = query(collection(db, 'bookings'), orderBy('date', 'asc'));
-                const snapshot = await getDocs(q);
-                const upcoming = [], today = new Date();
-                today.setHours(0,0,0,0);
-                let todayCount = 0;
-                
-                snapshot.forEach((d) => {
-                    const b = { id: d.id, ...d.data() };
-                    const bd = new Date(b.date + 'T00:00:00');
-                    if (bd >= today) upcoming.push(b);
-                    if (b.date === today.toISOString().split('T')[0]) todayCount++;
+                const snap = await getDocs(q);
+                const bookings = [];
+                const todayDate = new Date();
+                todayDate.setHours(0,0,0,0);
+                snap.forEach(d => {
+                    const b = {id: d.id, ...d.data()};
+                    if(new Date(b.date+'T00:00:00') >= todayDate) bookings.push(b);
                 });
-                
-                document.getElementById('totalBookings').textContent = snapshot.size;
-                document.getElementById('upcomingBookings').textContent = upcoming.length;
-                document.getElementById('todayBookings').textContent = todayCount;
-                
-                document.getElementById('bookingsList').innerHTML = upcoming.length ? upcoming.map(b => `
+                document.getElementById('totalBookings').textContent = snap.size;
+                document.getElementById('upcomingBookings').textContent = bookings.length;
+                document.getElementById('bookingsList').innerHTML = bookings.length ? bookings.map(b=>`
                     <div class="booking-item">
-                        <div class="booking-date">📅 ${new Date(b.date+'T00:00').toLocaleDateString()} @ ${b.time}</div>
+                        <div class="booking-date">📅 ${formatDate(b.date)} at ${formatTime(b.time)}</div>
                         <div class="booking-details">
                             <strong>${b.ownerName}</strong> - ${b.dogName} (${b.breed})<br>
                             📱 ${b.phone} | 📧 ${b.email}<br>
@@ -177,61 +293,108 @@
                             ${b.notes ? '<br>📝 '+b.notes : ''}
                         </div>
                     </div>
-                `).join('') : '<div class="no-data">No upcoming bookings</div>';
-            } catch (e) {
+                `).join('') : '<p style="text-align:center;color:#999;padding:2rem;">No upcoming bookings</p>';
+            } catch(e) {
                 console.error(e);
-                document.getElementById('bookingsList').innerHTML = '<div class="no-data">Error loading</div>';
+                document.getElementById('bookingsList').innerHTML = '<p style="color:#c62828;">Error loading bookings</p>';
             }
         }
         
-        async function loadBlockedDates() {
+        async function loadBlocked() {
             try {
-                const snapshot = await getDocs(collection(db, 'blocked-dates'));
+                const snap = await getDocs(collection(db, 'blocked-dates'));
                 const blocked = [];
-                snapshot.forEach(d => blocked.push({ id: d.id, ...d.data() }));
+                snap.forEach(d => blocked.push({id: d.id, ...d.data()}));
                 
-                document.getElementById('blockedDatesCount').textContent = blocked.length;
-                document.getElementById('blockedDatesList').innerHTML = blocked.length ? blocked
-                    .sort((a,b) => a.date.localeCompare(b.date))
-                    .map(item => `
-                        <div class="blocked-date-tag">
-                            ${new Date(item.date+'T00:00').toLocaleDateString()}
-                            <button onclick="window.unblockDate('${item.id}')">×</button>
-                        </div>
-                    `).join('') : '<div class="no-data">None</div>';
-            } catch (e) {
-                document.getElementById('blockedDatesCount').textContent = '0';
-                document.getElementById('blockedDatesList').innerHTML = '<div class="no-data">None</div>';
+                const wholeDays = blocked.filter(b => !b.time);
+                const specificTimes = blocked.filter(b => b.time);
+                
+                document.getElementById('blockedDatesCount').textContent = wholeDays.length;
+                document.getElementById('blockedTimesCount').textContent = specificTimes.length;
+                
+                if(blocked.length === 0) {
+                    document.getElementById('blockedList').innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">No blocked dates or times</p>';
+                } else {
+                    document.getElementById('blockedList').innerHTML = blocked
+                        .sort((a,b) => {
+                            if(a.date === b.date) return (a.time || '').localeCompare(b.time || '');
+                            return a.date.localeCompare(b.date);
+                        })
+                        .map(item => `
+                            <div class="blocked-item">
+                                <div class="blocked-item-info">
+                                    <div class="blocked-item-date">${formatDate(item.date)}</div>
+                                    <div class="blocked-item-time">${item.time ? '⏰ '+formatTime(item.time)+' only' : '🚫 Entire day blocked'}</div>
+                                </div>
+                                <button class="delete-btn" onclick="window.unblock('${item.id}')" title="Remove">×</button>
+                            </div>
+                        `).join('');
+                }
+            } catch(e) {
+                console.error(e);
             }
         }
         
-        window.blockDate = async function() {
-            const date = document.getElementById('blockDateInput').value;
-            if (!date) return alert('Select a date');
+        window.blockWholeDay = async function() {
+            const date = document.getElementById('blockWholeDay').value;
+            if(!date) return alert('Please select a date');
             try {
-                await addDoc(collection(db, 'blocked-dates'), { date, blockedAt: new Date().toISOString() });
-                document.getElementById('blockDateInput').value = '';
-                loadBlockedDates();
-                alert('✅ Date blocked');
-            } catch (e) {
-                alert('Error: ' + e.message);
+                await addDoc(collection(db, 'blocked-dates'), {
+                    date: date,
+                    blockedAt: new Date().toISOString()
+                });
+                document.getElementById('blockWholeDay').value = '';
+                loadBlocked();
+                alert('✅ Entire day blocked!');
+            } catch(e) {
+                alert('Error: '+e.message);
             }
         };
         
-        window.unblockDate = async function(id) {
-            if (!confirm('Unblock this date?')) return;
+        window.blockSpecificTime = async function() {
+            const date = document.getElementById('blockTimeDate').value;
+            const time = document.getElementById('blockTimeSlot').value;
+            if(!date || !time) return alert('Please select both date and time');
+            try {
+                await addDoc(collection(db, 'blocked-dates'), {
+                    date: date,
+                    time: time,
+                    blockedAt: new Date().toISOString()
+                });
+                document.getElementById('blockTimeDate').value = '';
+                document.getElementById('blockTimeSlot').value = '';
+                loadBlocked();
+                alert('✅ Time slot blocked!');
+            } catch(e) {
+                alert('Error: '+e.message);
+            }
+        };
+        
+        window.unblock = async function(id) {
+            if(!confirm('Remove this block?')) return;
             try {
                 await deleteDoc(doc(db, 'blocked-dates', id));
-                loadBlockedDates();
-            } catch (e) {
-                alert('Error: ' + e.message);
+                loadBlocked();
+                alert('✅ Unblocked!');
+            } catch(e) {
+                alert('Error: '+e.message);
             }
         };
         
+        function formatDate(dateString) {
+            const date = new Date(dateString+'T00:00:00');
+            return date.toLocaleDateString('en-US', {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+        }
+        
+        function formatTime(timeString) {
+            const [h,m] = timeString.split(':');
+            const hour = parseInt(h);
+            return `${hour%12||12}:${m} ${hour<12?'AM':'PM'}`;
+        }
+        
         loadBookings();
-        loadBlockedDates();
-        setInterval(() => { loadBookings(); loadBlockedDates(); }, 30000);
-        document.getElementById('blockDateInput').min = new Date().toISOString().split('T')[0];
+        loadBlocked();
+        setInterval(()=>{loadBookings();loadBlocked();}, 60000);
     </script>
 </body>
 </html>
