@@ -1191,7 +1191,7 @@
                         <span class="contact-icon">📧</span>
                         <div>
                             <strong>Email</strong><br>
-                            <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+                            <a href="mailto:tamethetangledoggrooming&#64;gmail&#46;com">tamethetangledoggrooming&#64;gmail&#46;com</a>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1227,7 +1227,6 @@
     </footer>
 
     <!-- Time slot management and waiver toggle -->
-    <script>
         // Calculate and display appointment duration
         function updateAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
@@ -1238,13 +1237,7 @@
             if (!sizeSelect.value) {
                 durationNote.style.display = 'none';
                 return;
-            }
-            
-            // Get base hours from selected size
-            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
-            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
-            
-            // Add 1 hour if matted
+      f matted
             if (mattedCheckbox.checked) {
                 hours += 1;
             }
