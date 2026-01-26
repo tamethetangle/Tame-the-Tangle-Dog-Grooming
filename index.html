@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tame the Tangle Dog Grooming - Professional Dog Grooming Services</title>
+    
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #a78bfa 100%);
+            color: white;
+            padding: 0.8rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #a78bfa 100%);
+            color: white;
+            padding: 120px 2rem 80px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            width: 300px;
+            max-width: 90%;
+            height: auto;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-logo {
+            height: 200px;
+            width: auto;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #a78bfa;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #a78bfa;
+        }
+
+        .services {
+            background: #f9f9f9;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(167,139,250,0.3);
+        }
+
+        .pricing-card h3 {
+            color: #a78bfa;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            color: #ec4899;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .service-list {
+            text-align: left;
+            margin-top: 1.5rem;
+            list-style: none;
+        }
+
+        .service-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .service-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ec4899;
+            font-weight: bold;
+        }
+
+        .addons {
+            background: linear-gradient(135deg, #ddd6fe 0%, #fce7f3 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .addons h3 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .addon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .addon-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .addon-price {
+            color: #ec4899;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Gallery Styles */
+        .gallery {
+            background: white;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 1.5rem 1rem 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Modal for full-size images */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #a78bfa;
+        }
+
+        .booking {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #a78bfa 100%);
+            color: white;
+        }
+
+        .booking-form {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #a78bfa;
+        }
+
+        .form-group input:not([type="checkbox"]):not([type="radio"]),
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd6fe;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.2rem;
+        }
+
+        .stripe-field {
+            padding: 12px;
+            border: 2px solid #ddd6fe;
+            border-radius: 8px;
+            background-color: white;
+            min-height: 48px;
+        }
+
+        #card-errors {
+            color: #c00;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #a78bfa 100%);
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .contact {
+            background: white;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 1rem 60px;
+                margin-top: 60px;
+            }
+
+            .hero-logo {
+                width: 200px;
+                max-width: 80%;
+                height: auto;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ============================================
+           BOOKING CALENDAR STYLES
+           ============================================ */
+        .booking-calendar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-header button {
+            background: #00796b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .calendar-header button:hover {
+            background: #005a4d;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            color: #00796b;
+            font-size: 1.2rem;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .calendar-day:not(.empty):not(.past):not(.booked):hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+            background: transparent;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #00796b;
+        }
+
+        .calendar-day.available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .calendar-day.available:hover {
+            background: #c8e6c9;
+        }
+
+        .calendar-day.booked {
+            background: #ffebee;
+            color: #c62828;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.selected {
+            background: #00796b !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.past {
+            background: #f5f5f5;
+            color: #bdbdbd;
+            cursor: not-allowed;
+        }
+
+        .calendar-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-days {
+                gap: 0.25rem;
+            }
+            
+            .calendar-day {
+                font-size: 0.85rem;
+            }
+            
+            .calendar-header h3 {
+                font-size: 1rem;
+            }
+            
+            .calendar-header button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+        /* ===================================== */
+        /* BOOKING CALENDAR STYLES */
+        /* ===================================== */
+        .booking-calendar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-header button {
+            background: #00796b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .calendar-header button:hover {
+            background: #005a4d;
+        }
+
+        .calendar-header h3 {
+            margin: 0;
+            color: #00796b;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover:not(.past):not(.booked):not(.empty) {
+            transform: scale(1.05);
+        }
+
+        .calendar-day.empty {
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #00796b;
+        }
+
+        .calendar-day.available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .calendar-day.available:hover {
+            background: #c8e6c9;
+        }
+
+        .calendar-day.booked {
+            background: #ffebee;
+            color: #c62828;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.selected {
+            background: #00796b !important;
+            color: white !important;
+        }
+
+        .calendar-day.past {
+            background: #f5f5f5;
+            color: #bdbdbd;
+            cursor: not-allowed;
+        }
+
+        .calendar-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-days {
+                gap: 0.25rem;
+            }
+            
+            .calendar-day {
+                font-size: 0.85rem;
+            }
+            
+            .calendar-legend {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+          
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services & Pricing</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#about">About Me</a></li>
+                <li><a href="#booking">Book Now</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+   <section id="home" class="hero">
+    <div class="hero-content">
+
+        <img src="Pup_spa.png" alt="Tame the Tangle Logo" class="hero-logo">
+
+        <h1>Tame the Tangle Dog Grooming</h1>
+        <p>Where Every Pup Gets the Royal Treatment</p>
+
+        <a href="#booking" class="cta-button">Book Appointment</a>
+
+    </div>
+</section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Services & Pricing</h2>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Small Dogs</h3>
+                    <div class="price">$40+</div>
+                    <p class="price-note">Starting price | 2 hour appointment</p>
+                    <ul class="service-list">
+                        <li>Bath & Blow Dry</li>
+                        <li>Haircut & Styling</li>
+                        <li>Nail Trim & File</li>
+                        <li>Ear Cleaning</li>
+                        <li>Sanitary Trim</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Medium Dogs</h3>
+                    <div class="price">$60+</div>
+                    <p class="price-note">Starting price | 2 hour appointment</p>
+                    <ul class="service-list">
+                        <li>Bath & Blow Dry</li>
+                        <li>Haircut & Styling</li>
+                        <li>Nail Trim & File</li>
+                        <li>Ear Cleaning</li>
+                        <li>Sanitary Trim</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Large Dogs</h3>
+                    <div class="price">$80+</div>
+                    <p class="price-note">Starting price | 3 hour appointment</p>
+                    <ul class="service-list">
+                        <li>Bath & Blow Dry</li>
+                        <li>Haircut & Styling</li>
+                        <li>Nail Trim & File</li>
+                        <li>Ear Cleaning</li>
+                        <li>Sanitary Trim</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #666; font-style: italic; margin-bottom: 2rem;">
+                *Final pricing depends on coat condition, matting, and temperament. Additional charges may apply for severely matted coats or difficult handling.
+            </p>
+
+            <div class="addons">
+                <h3>Add-On Services</h3>
+                <div class="addon-grid">
+                    <div class="addon-item">
+                        <div>💊 Medicated Bath</div>
+                        <div class="addon-price">+$10</div>
+                    </div>
+                    <div class="addon-item">
+                        <div>✨ Deep Conditioning</div>
+                        <div class="addon-price">+$10</div>
+                    </div>
+                    <div class="addon-item">
+                        <div>🐜 Flea Bath</div>
+                        <div class="addon-price">+$10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW GALLERY SECTION -->
+    <section id="gallery" class="gallery">
+        <div class="container">
+            <h2 class="section-title">My Work</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: #666;">
+                See the amazing transformations I've achieved for my furry clients!
+            </p>
+            
+            <div class="gallery-grid">
+                
+                <div class="gallery-item" onclick="openModal('Yorkiemix.jpg')">
+                    <img src="Yorkiemix.jpg" alt="Yorkie Mix After Grooming">
+                    <div class="gallery-caption">Snuggles and Kisses After Groom</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('aussiegroom.jpg')">
+                    <img src="aussiegroom.jpg" alt="Aussie after Grooming">
+                    <div class="gallery-caption">Deshed</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('bordercollie.jpg')">
+                    <img src="bordercollie.jpg" alt="Schnauzer Grooming">
+                    <div class="gallery-caption">Deshed</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('Schnauzermix.jpg')">
+                    <img src="Schnauzermix.jpg" alt="Schnauzer Mix Grooming">
+                    <div class="gallery-caption">Schnauzer Mix Makeover</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('Huskybutt.jpg')">
+                    <img src="Huskybutt.jpg" alt="Husky Grooming">
+                    <div class="gallery-caption">Husky Spa Day</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('Poodle.jpg')">
+                    <img src="Poodle.jpg" alt="Poodle Grooming">
+                    <div class="gallery-caption">Beautiful Poodle Groom</div>
+                </div>
+
+                <div class="gallery-item" onclick="openModal('Mix.jpg')">
+                    <img src="Mix.jpg" alt="Mixed Breed Grooming">
+                    <div class="gallery-caption">Adorable Mix Breed Groom</div>
+                </div>
+
+                <!-- Add more gallery items as needed -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for viewing full-size images -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <section id="about" class="contact">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem; line-height: 1.8;">
+                Hi, I'm the groomer behind Tame the Tangle Dog Grooming, and I believe grooming should be a gentle, positive experience for every dog. My salon is designed to be calm and welcoming, with one-on-one appointments so your dog always has my full attention—no rushing, no overcrowding, just patience and care. I work with dogs of all breeds, sizes, and temperaments, including puppies, seniors, and dogs who may be nervous or need a little extra compassion. If you're looking for a groomer who treats your dog like family, I'd love to welcome you to Tame the Tangle. 🐾
+            </p>
+        </div>
+    </section>
+
+    <section id="booking" class="booking">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">Book an Appointment</h2>
+
+            <form class="booking-form" onsubmit="handleBooking(event)">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Owner Name *</label>
+                        <input type="text" name="ownerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Dog Name *</label>
+                        <input type="text" name="dogName" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Breed *</label>
+                    <input type="text" name="breed" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Dog Size *</label>
+                    <select name="size" id="dogSize" required onchange="updateAppointmentDuration()">
+                        <option value="">Select size</option>
+                        <option value="small" data-hours="2">Small (Under 20 lbs) - $40+ (2 hour appointment)</option>
+                        <option value="medium" data-hours="2">Medium (20-50 lbs) - $60+ (2 hour appointment)</option>
+                        <option value="large" data-hours="3">Large (Over 50 lbs) - $80+ (3 hour appointment)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; background: #fff3cd; padding: 1rem; border-radius: 8px; border: 2px solid #ffc107;">
+                        <input type="checkbox" id="isMatted" name="isMatted" onchange="updateAppointmentDuration()">
+                        <span style="flex: 1;">
+                            <strong style="color: #856404;">⚠️ My dog has matted fur</strong><br>
+                            <small style="color: #856404;">This adds an extra hour to your appointment and may incur additional charges</small>
+                        </span>
+                    </label>
+                </div>
+
+                <div id="appointmentDurationNote" style="display: none; background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; color: #1565c0; border-left: 4px solid #1565c0;">
+                    <strong>Appointment Duration:</strong> <span id="durationText">2 hours</span>
+                    <br><small>This will block out the selected time plus the required duration</small>
+                </div>
+
+                <!-- Booking Calendar -->
+                <div class="booking-calendar">
+                    <div class="calendar-header">
+                        <button type="button" onclick="previousMonth()">&larr; Prev</button>
+                        <h3 id="calendarMonth">January 2026</h3>
+                        <button type="button" onclick="nextMonth()">Next &rarr;</button>
+                    </div>
+                    
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday">Sun</div>
+                        <div class="calendar-weekday">Mon</div>
+                        <div class="calendar-weekday">Tue</div>
+                        <div class="calendar-weekday">Wed</div>
+                        <div class="calendar-weekday">Thu</div>
+                        <div class="calendar-weekday">Fri</div>
+                        <div class="calendar-weekday">Sat</div>
+                    </div>
+                    
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Days will be generated by JavaScript -->
+                    </div>
+                    
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e8f5e9;"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ffebee;"></div>
+                            <span>Fully Booked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #00796b;"></div>
+                            <span>Selected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preferred Date *</label>
+                        <input type="date" name="date" id="appointmentDate" required onchange="updateAvailableTimes()">
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">
+                            Click a date on the calendar above or select manually
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Time * </label>
+                        <select name="time" id="appointmentTime" required>
+                            <option value="">Select a date first</option>
+                        </select>
+                        <p id="timeNote" style="font-size: 0.85rem; color: #dc3545; margin-top: 0.5rem; display: none;">
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Add-ons (Optional)</label>
+                    <div class="checkbox-label">
+                        <input type="checkbox" name="addon" value="medicated">
+                        Medicated Bath (+$10)
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" name="addon" value="conditioning">
+                        Deep Conditioning (+$10)
+                    </div>
+                    <div class="checkbox-label">
+                        <input type="checkbox" name="addon" value="flea">
+                        Flea Bath (+$10)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Special Notes</label>
+                    <textarea name="notes" rows="3" placeholder="Any behavioral issues, health conditions, or special requests..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="returningClient" name="returningClient" onchange="toggleWaiverRequirement()">
+                        <span>I'm a returning client</span>
+                    </label>
+                </div>
+
+                <div id="waiverRequirement" class="form-group" style="background: #fff3cd; padding: 1rem; border-radius: 8px; border: 2px solid #ffc107;">
+                    <p style="margin: 0 0 0.5rem 0; font-weight: bold; color: #856404;">
+                        ⚠️ New Client Waiver Required
+                    </p>
+                    <p style="margin: 0 0 1rem 0; color: #856404; font-size: 0.9rem;">
+                        All first-time clients must complete our waiver form before booking. This only takes 2-3 minutes.
+                    </p>
+                    <a href="https://forms.zoho.com/tamethetangledoggrooming1/form/TametheTangleGroomingWaiver" 
+                       target="_blank" 
+                       style="display: inline-block; background: #00796b; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                        📋 Complete Waiver Form (Opens in New Tab)
+                    </a>
+                    <p style="margin: 1rem 0 0 0; font-size: 0.85rem; color: #856404;">
+                        After completing the waiver, return here to finish your booking.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="waiverCompleted" name="waiverCompleted" required>
+                        <span>I have completed the waiver form (required for new clients) *</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Card Number *</label>
+                    <div id="card-number" class="stripe-field"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiration Date *</label>
+                        <div id="card-expiry" class="stripe-field"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>CVC *</label>
+                        <div id="card-cvc" class="stripe-field"></div>
+                    </div>
+                </div>
+
+                <div id="card-errors"></div>
+
+                <p style="font-size: 0.9rem; color: #666; margin: 1rem 0; text-align: center;">
+                    💳 <strong>$30 non-refundable deposit will be charged immediately</strong><br>
+                    This deposit is applied toward your total grooming cost
+                </p>
+
+                <button type="submit" class="submit-btn">Book Appointment</button>
+            </form>
+
+            <!-- Waitlist Notice -->
+            <div style="background: #e3f2fd; padding: 2rem; border-radius: 12px; margin-top: 3rem; text-align: center; border: 2px solid #2196f3;">
+                <h3 style="color: #1976d2; margin-bottom: 1rem;">📋 Can't Find an Available Time?</h3>
+                <p style="color: #0d47a1; margin-bottom: 1.5rem;">
+                    Join our waitlist! I'll notify you when spots open up or if there are any cancellations.
+                </p>
+                <a href="/cdn-cgi/l/email-protection#b2c6d3dfd7c6dad7c6d3dcd5ded7d6ddd5d5c0dddddfdbdcd5f2d5dfd3dbde9cd1dddf8dc1c7d0d8d7d1c68fe5d3dbc6dedbc1c692e0d7c3c7d7c1c694d0ddd6cb8fe2ded7d3c1d792d3d6d692dfd792c6dd92cbddc7c092c5d3dbc6dedbc1c6939782f39782f3fcd3dfd7889782f3e2dadddcd7889782f3f6ddd592fcd3dfd7889782f3e2c0d7d4d7c0c0d7d692f6d3cbc19de6dbdfd7c188" style="display: inline-block; background: #2196f3; color: white; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                    📧 Join the Waitlist
+                </a>
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Information</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <div>
+                            <strong>Phone</strong><br>
+                            336-582-2884 (Hope Ariel)
+                        </div>
+                    </div>
+                   <div class="contact-item">
+                        <span class="contact-icon">📧</span>
+                        <div>
+                            <strong>Email</strong><br>
+                            <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <div>
+                            <strong>Location</strong><br>
+                            1318 Harrison Crossroad Loop<br>
+                            Reidsville, NC
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">🕐</span>
+                        <div>
+                            <strong>Hours</strong><br>
+                            Mon-Fri: 5pm - 7pm<br>
+                            Sat: 9am - 7pm (Last booking at 5pm)<br>
+                            Sun: Closed
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a href="https://www.facebook.com/share/17fWocSjDP/" target="_blank" style="display: inline-flex; align-items: center; gap: 0.8rem; background: #1877f2; color: white; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;">
+                        <span style="font-size: 1.5rem;">📘</span>
+                        Visit Me on Facebook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
+    </footer>
+
+    <!-- Time slot management and waiver toggle -->
+    <script>
+        // Calculate and display appointment duration
+        function updateAppointmentDuration() {
+            const sizeSelect = document.getElementById('dogSize');
+            const mattedCheckbox = document.getElementById('isMatted');
+            const durationNote = document.getElementById('appointmentDurationNote');
+            const durationText = document.getElementById('durationText');
+            
+            if (!sizeSelect.value) {
+                durationNote.style.display = 'none';
+                return;
+            }
+            
+            // Get base hours from selected size
+            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
+            
+            // Add 1 hour if matted
+            if (mattedCheckbox.checked) {
+                hours += 1;
+            }
+            
+            // Update display
+            durationText.textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
+            durationNote.style.display = 'block';
+            
+            // Update available times based on new duration
+            updateAvailableTimes();
+        }
+        
+        // Get appointment duration in hours
+        function getAppointmentDuration() {
+            const sizeSelect = document.getElementById('dogSize');
+            const mattedCheckbox = document.getElementById('isMatted');
+            
+            if (!sizeSelect.value) return 2; // Default 2 hours
+            
+            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
+            
+            if (mattedCheckbox.checked) {
+                hours += 1;
+            }
+            
+            return hours;
+        }
+        
+        // Update available time slots based on selected date
+        function updateAvailableTimes() {
+            const dateInput = document.getElementById('appointmentDate');
+            const timeSelect = document.getElementById('appointmentTime');
+            const timeNote = document.getElementById('timeNote');
+            
+            if (!dateInput.value) {
+                timeSelect.innerHTML = '<option value="">Select a date first</option>';
+                return;
+            }
+            
+            const selectedDate = new Date(dateInput.value + 'T00:00:00');
+            const dayOfWeek = selectedDate.getDay();
+            const selectedDateString = dateInput.value;
+            
+            let times = [];
+            let note = '';
+            
+            if (dayOfWeek === 0) {
+                timeSelect.innerHTML = '<option value="">Closed on Sundays</option>';
+                timeNote.textContent = '❌ We are closed on Sundays. Please select another day.';
+                timeNote.style.display = 'block';
+                return;
+            }
+            else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                times = ['17:00', '18:00', '19:00'];
+                note = 'Mon-Fri hours: 5:00 PM - 7:00 PM';
+            }
+            else if (dayOfWeek === 6) {
+                times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+                note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
+            }
+            
+            // Filter out blocked times for this date
+            const blockedTimesForDate = window.getBlockedTimesForDate ? window.getBlockedTimesForDate(selectedDateString) : [];
+            const availableTimes = times.filter(time => !blockedTimesForDate.includes(time));
+            
+            if (availableTimes.length === 0) {
+                timeSelect.innerHTML = '<option value="">No times available for this date</option>';
+                timeNote.textContent = '❌ All time slots are blocked for this date.';
+                timeNote.style.color = '#dc3545';
+                timeNote.style.display = 'block';
+                return;
+            }
+            
+            timeSelect.innerHTML = '<option value="">Select a time</option>';
+            availableTimes.forEach(time => {
+                const option = document.createElement('option');
+                option.value = time;
+                const [hours, minutes] = time.split(':');
+                const hour12 = hours % 12 || 12;
+                const ampm = hours < 12 ? 'AM' : 'PM';
+                option.textContent = `${hour12}:${minutes} ${ampm}`;
+                timeSelect.appendChild(option);
+            });
+            
+            if (blockedTimesForDate.length > 0) {
+                note += ` (${blockedTimesForDate.length} time${blockedTimesForDate.length > 1 ? 's' : ''} unavailable)`;
+            }
+            
+            timeNote.textContent = note;
+            timeNote.style.color = '#00796b';
+            timeNote.style.display = 'block';
+        }
+        
+        function toggleWaiverRequirement() {
+            const returningCheckbox = document.getElementById('returningClient');
+            const waiverRequirement = document.getElementById('waiverRequirement');
+            const waiverCompleted = document.getElementById('waiverCompleted');
+            
+            if (returningCheckbox.checked) {
+                waiverRequirement.style.display = 'none';
+                waiverCompleted.required = false;
+                waiverCompleted.checked = true;
+            } else {
+                waiverRequirement.style.display = 'block';
+                waiverCompleted.required = true;
+                waiverCompleted.checked = false;
+            }
+        }
+        
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+    </script>
+
+    <!-- CRITICAL: This loads your payment and calendar system! -->
+    <script src="config.js"></script>
+</body>
+</html>
