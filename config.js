@@ -239,6 +239,52 @@ async function saveReviewToFirebase(reviewData) {
 }
 
 // ============================================
+// AUTOMATIC TIME BLOCKING FOR APPOINTMENTS
+// ============================================
+async function blockOverlappingTimeSlots(date, startTime, durationHours, bookingId) {
+    if (!db) {
+        console.log(`Would block ${durationHours} hours starting at ${startTime} on ${date}`);
+        return;
+    }
+    
+    try {
+        // Parse start time (format: "17:00")
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        
+        // Calculate which hours to block
+        const timeSlotsToBlock = [];
+        for (let i = 0; i < durationHours; i++) {
+            const hour = startHour + i;
+            if (hour < 24) {  // Don't block past midnight
+                const timeSlot = `${String(hour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                timeSlotsToBlock.push(timeSlot);
+            }
+        }
+        
+        console.log(`📅 Blocking ${timeSlotsToBlock.length} time slots:`, timeSlotsToBlock);
+        
+        // Create a blocked-dates entry for each overlapping time slot
+        const blockedDatesRef = collection(db, 'blocked-dates');
+        const blockPromises = timeSlotsToBlock.map(timeSlot => 
+            addDoc(blockedDatesRef, {
+                date: date,
+                time: timeSlot,
+                reason: 'appointment',
+                blockedBy: bookingId,
+                blockedAt: new Date().toISOString()
+            })
+        );
+        
+        await Promise.all(blockPromises);
+        console.log(`✅ Successfully blocked ${timeSlotsToBlock.length} time slots`);
+        
+    } catch (error) {
+        console.error('Error blocking time slots:', error);
+        // Don't fail the booking if blocking fails
+    }
+}
+
+// ============================================
 // EMAILJS INTEGRATION
 // ============================================
 
@@ -356,10 +402,9 @@ async function handleBooking(event) {
             dogName: formData.get('dogName'),
             breed: formData.get('breed'),
             size: formData.get('size'),
+            isMatted: formData.get('isMatted') === 'on',
             date: formData.get('date'),
             time: formData.get('time'),
-            extraTime: formData.get('extraTime'),
-            firstTime: formData.get('firstTime'),
             notes: formData.get('notes') || '',
             addons: []
         };
@@ -368,9 +413,9 @@ async function handleBooking(event) {
             data.addons.push(addon);
         });
         
-        // Calculate costs
-        let duration = (data.size === 'large') ? 3 : 2;
-        if (data.extraTime === 'yes') duration += 1;
+        // Calculate duration based on size and matting
+        let duration = (data.size === 'large') ? 3 : 2;  // Large=3hrs, Small/Medium=2hrs
+        if (data.isMatted) duration += 1;  // Add 1 hour if matted
         data.duration = duration;
         
         let estimatedCost = CONFIG.pricing[data.size] || 40;
@@ -411,6 +456,10 @@ async function handleBooking(event) {
         submitBtn.textContent = 'Saving booking...';
         const booking = await saveBookingToFirebase(data);
         data.bookingId = booking.id;
+        
+        // Block overlapping time slots automatically
+        submitBtn.textContent = 'Blocking time slots...';
+        await blockOverlappingTimeSlots(data.date, data.time, data.duration, booking.id);
         
         // Send emails
         submitBtn.textContent = 'Sending confirmation...';
@@ -574,6 +623,7 @@ let currentCalendarDate = new Date();
 let selectedDate = null;
 let bookedDates = [];
 let blockedDates = [];
+let blockedTimes = {}; // NEW: Store blocked times per date {date: [time1, time2]}
 
 // MANUALLY BLOCK DATES - Add your vacation/holiday dates here
 const MANUALLY_BLOCKED_DATES = [
@@ -613,18 +663,34 @@ async function loadBookedDates() {
             }
         });
         
-        // Check for manually blocked dates in Firebase
+        // Check for blocked dates and times in Firebase
         try {
             const blockedRef = collection(db, 'blocked-dates');
             const blockedSnapshot = await getDocs(blockedRef);
-            const firebaseBlocked = [];
+            
+            const wholeDayBlocks = [];
+            blockedTimes = {}; // Reset
+            
             blockedSnapshot.forEach((doc) => {
-                firebaseBlocked.push(doc.data().date);
+                const data = doc.data();
+                if (data.time) {
+                    // Time-specific block
+                    if (!blockedTimes[data.date]) {
+                        blockedTimes[data.date] = [];
+                    }
+                    blockedTimes[data.date].push(data.time);
+                } else {
+                    // Whole day block
+                    wholeDayBlocks.push(data.date);
+                }
             });
-            blockedDates = [...MANUALLY_BLOCKED_DATES, ...firebaseBlocked];
+            
+            blockedDates = [...MANUALLY_BLOCKED_DATES, ...wholeDayBlocks];
+            console.log(`📅 Loaded: ${Object.keys(blockedTimes).length} dates with time blocks, ${blockedDates.length} full day blocks`);
         } catch (error) {
             console.log('No blocked-dates collection yet, using manual only');
             blockedDates = [...MANUALLY_BLOCKED_DATES];
+            blockedTimes = {};
         }
         
         renderCalendar();
@@ -753,3 +819,13 @@ setTimeout(function() {
     }
 }, 1000); // Wait 1 second for Firebase to initialize
 
+
+// ============================================
+// HELPER FUNCTION: Get Blocked Times for Date
+// ============================================
+function getBlockedTimesForDate(dateString) {
+    return blockedTimes[dateString] || [];
+}
+
+// Make it globally accessible
+window.getBlockedTimesForDate = getBlockedTimesForDate;

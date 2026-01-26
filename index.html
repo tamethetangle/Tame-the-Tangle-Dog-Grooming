@@ -1004,12 +1004,27 @@
 
                 <div class="form-group">
                     <label>Dog Size *</label>
-                    <select name="size" required>
+                    <select name="size" id="dogSize" required onchange="updateAppointmentDuration()">
                         <option value="">Select size</option>
-                        <option value="small">Small (Under 20 lbs) - $40+</option>
-                        <option value="medium">Medium (20-50 lbs) - $60+</option>
-                        <option value="large">Large (Over 50 lbs) - $80+</option>
+                        <option value="small" data-hours="2">Small (Under 20 lbs) - $40+ (2 hour appointment)</option>
+                        <option value="medium" data-hours="2">Medium (20-50 lbs) - $60+ (2 hour appointment)</option>
+                        <option value="large" data-hours="3">Large (Over 50 lbs) - $80+ (3 hour appointment)</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; background: #fff3cd; padding: 1rem; border-radius: 8px; border: 2px solid #ffc107;">
+                        <input type="checkbox" id="isMatted" name="isMatted" onchange="updateAppointmentDuration()">
+                        <span style="flex: 1;">
+                            <strong style="color: #856404;">⚠️ My dog has matted fur</strong><br>
+                            <small style="color: #856404;">This adds an extra hour to your appointment and may incur additional charges</small>
+                        </span>
+                    </label>
+                </div>
+
+                <div id="appointmentDurationNote" style="display: none; background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; color: #1565c0; border-left: 4px solid #1565c0;">
+                    <strong>Appointment Duration:</strong> <span id="durationText">2 hours</span>
+                    <br><small>This will block out the selected time plus the required duration</small>
                 </div>
 
                 <!-- Booking Calendar -->
@@ -1176,7 +1191,7 @@
                         <span class="contact-icon">📧</span>
                         <div>
                             <strong>Email</strong><br>
-                            <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+                            <a href="/cdn-cgi/l/email-protection#e99d88848c9d818c9d88878e858c8d868e8e9b86868480878ea98e84888085c78a8684"><span class="__cf_email__" data-cfemail="bdc9dcd0d8c9d5d8c9dcd3dad1d8d9d2dadacfd2d2d0d4d3dafddad0dcd4d193ded2d0">[email&#160;protected]</span></a>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1213,6 +1228,52 @@
 
     <!-- Time slot management and waiver toggle -->
     <script>
+        // Calculate and display appointment duration
+        function updateAppointmentDuration() {
+            const sizeSelect = document.getElementById('dogSize');
+            const mattedCheckbox = document.getElementById('isMatted');
+            const durationNote = document.getElementById('appointmentDurationNote');
+            const durationText = document.getElementById('durationText');
+            
+            if (!sizeSelect.value) {
+                durationNote.style.display = 'none';
+                return;
+            }
+            
+            // Get base hours from selected size
+            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
+            
+            // Add 1 hour if matted
+            if (mattedCheckbox.checked) {
+                hours += 1;
+            }
+            
+            // Update display
+            durationText.textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
+            durationNote.style.display = 'block';
+            
+            // Update available times based on new duration
+            updateAvailableTimes();
+        }
+        
+        // Get appointment duration in hours
+        function getAppointmentDuration() {
+            const sizeSelect = document.getElementById('dogSize');
+            const mattedCheckbox = document.getElementById('isMatted');
+            
+            if (!sizeSelect.value) return 2; // Default 2 hours
+            
+            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
+            
+            if (mattedCheckbox.checked) {
+                hours += 1;
+            }
+            
+            return hours;
+        }
+        
         // Update available time slots based on selected date
         function updateAvailableTimes() {
             const dateInput = document.getElementById('appointmentDate');
@@ -1226,6 +1287,7 @@
             
             const selectedDate = new Date(dateInput.value + 'T00:00:00');
             const dayOfWeek = selectedDate.getDay();
+            const selectedDateString = dateInput.value;
             
             let times = [];
             let note = '';
@@ -1245,8 +1307,20 @@
                 note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
             }
             
+            // Filter out blocked times for this date
+            const blockedTimesForDate = window.getBlockedTimesForDate ? window.getBlockedTimesForDate(selectedDateString) : [];
+            const availableTimes = times.filter(time => !blockedTimesForDate.includes(time));
+            
+            if (availableTimes.length === 0) {
+                timeSelect.innerHTML = '<option value="">No times available for this date</option>';
+                timeNote.textContent = '❌ All time slots are blocked for this date.';
+                timeNote.style.color = '#dc3545';
+                timeNote.style.display = 'block';
+                return;
+            }
+            
             timeSelect.innerHTML = '<option value="">Select a time</option>';
-            times.forEach(time => {
+            availableTimes.forEach(time => {
                 const option = document.createElement('option');
                 option.value = time;
                 const [hours, minutes] = time.split(':');
@@ -1255,6 +1329,10 @@
                 option.textContent = `${hour12}:${minutes} ${ampm}`;
                 timeSelect.appendChild(option);
             });
+            
+            if (blockedTimesForDate.length > 0) {
+                note += ` (${blockedTimesForDate.length} time${blockedTimesForDate.length > 1 ? 's' : ''} unavailable)`;
+            }
             
             timeNote.textContent = note;
             timeNote.style.color = '#00796b';
@@ -1280,13 +1358,4 @@
         document.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.getElementById('appointmentDate');
             if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
-            }
-        });
-    </script>
-
-    <!-- CRITICAL: This loads your payment system! -->
-    <script src="config.js"></script>
-</body>
-</html>
+ 
