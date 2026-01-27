@@ -1223,65 +1223,58 @@
     </section>
 
     <footer>
+    <footer>
         <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
     </footer>
 
-    <!-- Time slot management and waiver toggle -->
     <script>
-        // Calculate and display appointment duration
         function updateAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
             const mattedCheckbox = document.getElementById('isMatted');
             const durationNote = document.getElementById('appointmentDurationNote');
             const durationText = document.getElementById('durationText');
             
-            if (!sizeSelect.value) {
-                durationNote.style.display = 'none';
+            if (!sizeSelect || !sizeSelect.value) {
+                if (durationNote) durationNote.style.display = 'none';
                 return;
             }
             
-            // Get base hours from selected size
             const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
             let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
             
-            // Add 1 hour if matted
-            if (mattedCheckbox.checked) {
+            if (mattedCheckbox && mattedCheckbox.checked) {
                 hours += 1;
             }
             
-            // Update display
-            durationText.textContent = `${hours} hour${hours > 1 ? 's' : ''}`;
-            durationNote.style.display = 'block';
+            if (durationText) durationText.textContent = hours + ' hour' + (hours > 1 ? 's' : '');
+            if (durationNote) durationNote.style.display = 'block';
             
-            // Update available times based on new duration
             updateAvailableTimes();
         }
         
-        // Get appointment duration in hours
         function getAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
             const mattedCheckbox = document.getElementById('isMatted');
             
-            if (!sizeSelect.value) return 2; // Default 2 hours
+            if (!sizeSelect || !sizeSelect.value) return 2;
             
             const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
             let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
             
-            if (mattedCheckbox.checked) {
+            if (mattedCheckbox && mattedCheckbox.checked) {
                 hours += 1;
             }
             
             return hours;
         }
         
-        // Update available time slots based on selected date
         function updateAvailableTimes() {
             const dateInput = document.getElementById('appointmentDate');
             const timeSelect = document.getElementById('appointmentTime');
             const timeNote = document.getElementById('timeNote');
             
-            if (!dateInput.value) {
-                timeSelect.innerHTML = '<option value="">Select a date first</option>';
+            if (!dateInput || !dateInput.value) {
+                if (timeSelect) timeSelect.innerHTML = '<option value="">Select a date first</option>';
                 return;
             }
             
@@ -1294,8 +1287,10 @@
             
             if (dayOfWeek === 0) {
                 timeSelect.innerHTML = '<option value="">Closed on Sundays</option>';
-                timeNote.textContent = '❌ We are closed on Sundays. Please select another day.';
-                timeNote.style.display = 'block';
+                if (timeNote) {
+                    timeNote.textContent = '❌ We are closed on Sundays. Please select another day.';
+                    timeNote.style.display = 'block';
+                }
                 return;
             }
             else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
@@ -1307,15 +1302,16 @@
                 note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
             }
             
-            // Filter out blocked times for this date
             const blockedTimesForDate = window.getBlockedTimesForDate ? window.getBlockedTimesForDate(selectedDateString) : [];
             const availableTimes = times.filter(time => !blockedTimesForDate.includes(time));
             
             if (availableTimes.length === 0) {
                 timeSelect.innerHTML = '<option value="">No times available for this date</option>';
-                timeNote.textContent = '❌ All time slots are blocked for this date.';
-                timeNote.style.color = '#dc3545';
-                timeNote.style.display = 'block';
+                if (timeNote) {
+                    timeNote.textContent = '❌ All time slots are blocked for this date.';
+                    timeNote.style.color = '#dc3545';
+                    timeNote.style.display = 'block';
+                }
                 return;
             }
             
@@ -1323,20 +1319,23 @@
             availableTimes.forEach(time => {
                 const option = document.createElement('option');
                 option.value = time;
-                const [hours, minutes] = time.split(':');
+                const hours = parseInt(time.split(':')[0]);
+                const minutes = time.split(':')[1];
                 const hour12 = hours % 12 || 12;
                 const ampm = hours < 12 ? 'AM' : 'PM';
-                option.textContent = `${hour12}:${minutes} ${ampm}`;
+                option.textContent = hour12 + ':' + minutes + ' ' + ampm;
                 timeSelect.appendChild(option);
             });
             
             if (blockedTimesForDate.length > 0) {
-                note += ` (${blockedTimesForDate.length} time${blockedTimesForDate.length > 1 ? 's' : ''} unavailable)`;
+                note += ' (' + blockedTimesForDate.length + ' time' + (blockedTimesForDate.length > 1 ? 's' : '') + ' unavailable)';
             }
             
-            timeNote.textContent = note;
-            timeNote.style.color = '#00796b';
-            timeNote.style.display = 'block';
+            if (timeNote) {
+                timeNote.textContent = note;
+                timeNote.style.color = '#00796b';
+                timeNote.style.display = 'block';
+            }
         }
         
         function toggleWaiverRequirement() {
@@ -1344,15 +1343,30 @@
             const waiverRequirement = document.getElementById('waiverRequirement');
             const waiverCompleted = document.getElementById('waiverCompleted');
             
-            if (returningCheckbox.checked) {
-                waiverRequirement.style.display = 'none';
-                waiverCompleted.required = false;
-                waiverCompleted.checked = true;
+            if (returningCheckbox && returningCheckbox.checked) {
+                if (waiverRequirement) waiverRequirement.style.display = 'none';
+                if (waiverCompleted) {
+                    waiverCompleted.required = false;
+                    waiverCompleted.checked = true;
+                }
             } else {
-                waiverRequirement.style.display = 'block';
-                waiverCompleted.required = true;
-                waiverCompleted.checked = false;
+                if (waiverRequirement) waiverRequirement.style.display = 'block';
+                if (waiverCompleted) {
+                    waiverCompleted.required = true;
+                    waiverCompleted.checked = false;
+                }
             }
         }
         
-              
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('appointmentDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+    </script>
+
+    <script src="config.js"></script>
+</body>
+</html>
