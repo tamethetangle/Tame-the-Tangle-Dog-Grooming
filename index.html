@@ -1191,7 +1191,7 @@
                         <span class="contact-icon">📧</span>
                         <div>
                             <strong>Email</strong><br>
-                            <a href="mailto:tamethetangledoggrooming&#64;gmail&#46;com">tamethetangledoggrooming&#64;gmail&#46;com</a>
+                            <a href="/cdn-cgi/l/email-protection#dda9bcb0b8a9b5b8a9bcb3bab1b8b9b2babaafb2b2b0b4b3ba9dbab0bcb4b1f3beb2b0"><span class="__cf_email__" data-cfemail="1c687d7179687479687d727b707978737b7b6e73737175727b5c7b717d7570327f7371">[email&#160;protected]</span></a>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1227,6 +1227,7 @@
     </footer>
 
     <!-- Time slot management and waiver toggle -->
+    <script>
         // Calculate and display appointment duration
         function updateAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
@@ -1237,7 +1238,13 @@
             if (!sizeSelect.value) {
                 durationNote.style.display = 'none';
                 return;
-      f matted
+            }
+            
+            // Get base hours from selected size
+            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+            let hours = parseInt(selectedOption.getAttribute('data-hours')) || 2;
+            
+            // Add 1 hour if matted
             if (mattedCheckbox.checked) {
                 hours += 1;
             }
@@ -1348,13 +1355,4 @@
             }
         }
         
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
-            }
-        });
-    </script>
-
-    <!-- CRITICAL: This loads your payment and calendar system! -->
-    <script src="config.js"></script>
-</body>
-</html>
+              
