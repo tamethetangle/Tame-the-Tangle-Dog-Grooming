@@ -594,8 +594,8 @@ async function loadBookedDates() {
             return;
         }
         
-        const bookingsRef = collection(db, 'bookings');
-        const snapshot = await getDocs(bookingsRef);
+        const bookingsRef = db.collection('bookings');
+        const snapshot = await bookingsRef.get();
         
         bookedDates = [];
         const dateCount = {};
@@ -615,8 +615,8 @@ async function loadBookedDates() {
         
         // Check for blocked dates and times in Firebase
         try {
-            const blockedRef = collection(db, 'blocked-dates');
-            const blockedSnapshot = await getDocs(blockedRef);
+            const blockedRef = db.collection('blocked-dates');
+            const blockedSnapshot = await blockedRef.get();
             
             const wholeDayBlocks = [];
             blockedTimes = {}; // Reset
