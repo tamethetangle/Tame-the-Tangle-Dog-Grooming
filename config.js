@@ -27,7 +27,7 @@ const CONFIG = {
     // EmailJS (ADD YOUR KEYS)
     emailjs: {
         publicKey: "CWcEa2jyhbPkl6_Su",
-        serviceId: "service_abc123",
+        serviceId: "service_7psfawy",
         templates: {
             confirmation: "template_igpeyry",
             notification: "template_3xhhl1m",
@@ -243,12 +243,25 @@ async function saveReviewToFirebase(reviewData) {
 // ============================================
 
 function initializeEmailJS() {
-    if (CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
-        console.warn("EmailJS not configured");
+    // Check if EmailJS library is loaded
+    if (typeof emailjs === 'undefined') {
+        console.warn("⚠️ EmailJS library not loaded yet");
         return false;
     }
-    emailjs.init(CONFIG.emailjs.publicKey);
-    return true;
+    
+    if (CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
+        console.warn("⚠️ EmailJS not configured - using placeholder key");
+        return false;
+    }
+    
+    try {
+        emailjs.init(CONFIG.emailjs.publicKey);
+        console.log("✅ EmailJS initialized successfully");
+        return true;
+    } catch (error) {
+        console.error("❌ EmailJS initialization failed:", error);
+        return false;
+    }
 }
 
 async function sendConfirmationEmail(bookingData) {
