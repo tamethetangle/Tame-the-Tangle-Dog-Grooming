@@ -143,7 +143,7 @@ async function chargeDeposit(bookingData) {
         console.log('✅ Payment method created:', paymentMethod.id);
         
         // Call backend to charge the deposit
-        const response = await fetch(`${CONFIG.api.baseUrl}/api/create-payment-intent`, {
+        const response = await fetch(`${CONFIG.api.baseUrl}/api/create-booking`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
