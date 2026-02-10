@@ -212,10 +212,48 @@ async function saveBookingToFirebase(bookingData) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             status: 'confirmed'
         });
+        
+        // Automatically block all time slots for the appointment duration
+        await blockAppointmentTimeSlots(bookingData.date, bookingData.time, bookingData.duration, docRef.id);
+        
         return { id: docRef.id };
     } catch (error) {
         console.error("Firebase error:", error);
         throw error;
+    }
+}
+
+// Block all 30-minute time slots for the appointment duration
+async function blockAppointmentTimeSlots(date, startTime, durationHours, bookingId) {
+    if (!db) return;
+    
+    try {
+        // Parse the start time (e.g., "17:00")
+        const [hours, minutes] = startTime.split(':').map(Number);
+        
+        // Calculate how many 30-minute slots to block
+        const totalSlots = durationHours * 2; // 2 slots per hour
+        
+        // Block each 30-minute slot
+        for (let i = 0; i < totalSlots; i++) {
+            const slotMinutes = hours * 60 + minutes + (i * 30);
+            const slotHours = Math.floor(slotMinutes / 60);
+            const slotMins = slotMinutes % 60;
+            const timeSlot = `${String(slotHours).padStart(2, '0')}:${String(slotMins).padStart(2, '0')}`;
+            
+            await db.collection('blocked-dates').add({
+                date: date,
+                time: timeSlot,
+                bookingId: bookingId, // Link to the booking so we can unblock if cancelled
+                blockedAt: new Date().toISOString(),
+                autoBlocked: true
+            });
+        }
+        
+        console.log(`✅ Blocked ${totalSlots} time slots for ${durationHours} hour appointment`);
+    } catch (error) {
+        console.error("Error blocking time slots:", error);
+        // Don't throw - we don't want to fail the booking if blocking fails
     }
 }
 
@@ -590,7 +628,8 @@ let blockedDates = [];
 
 // MANUALLY BLOCK DATES - Add your vacation/holiday dates here
 const MANUALLY_BLOCKED_DATES = [
-    '2026-02-14',  // Test block
+    // Example: '2026-02-14',  // Valentine's Day
+    // Add your dates in YYYY-MM-DD format
 ];
 
 // Maximum bookings per day (adjust based on your capacity)

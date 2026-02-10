@@ -476,7 +476,7 @@
 
 ⚠️ This will:
 - Delete the booking from the system
-- Free up the time slot
+- Free up ALL time slots for this appointment
 - You'll need to manually refund/contact the customer
 
 Continue?`)) {
@@ -484,13 +484,33 @@ Continue?`)) {
             }
             
             try {
+                // First, delete all blocked time slots associated with this booking
+                const blockedQuery = query(
+                    collection(db, 'blocked-dates'),
+                    where('bookingId', '==', bookingId)
+                );
+                const blockedSnap = await getDocs(blockedQuery);
+                
+                // Delete all associated blocked time slots
+                const deletePromises = [];
+                blockedSnap.forEach((doc) => {
+                    deletePromises.push(deleteDoc(doc.ref));
+                });
+                await Promise.all(deletePromises);
+                
+                // Then delete the booking
                 await deleteDoc(doc(db, 'bookings', bookingId));
+                
                 alert(`✅ Booking cancelled for ${dogName}!
+
+Removed booking and freed up ${blockedSnap.size} time slot(s).
 
 Remember to:
 - Contact ${ownerName} about the cancellation
 - Process any refund if needed`);
+                
                 loadBookings();
+                loadBlocked(); // Refresh blocked times list
             } catch(e) {
                 alert('Error cancelling booking: ' + e.message);
                 console.error(e);
