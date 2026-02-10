@@ -400,6 +400,18 @@ async function handleBooking(event) {
     
     try {
         const formData = new FormData(event.target);
+        const selectedDate = formData.get('date');
+        const selectedTime = formData.get('time');
+        
+        // Check if the selected time is blocked
+        const blockedTimesForDate = window.getBlockedTimesForDate(selectedDate);
+        if (blockedTimesForDate.includes(selectedTime)) {
+            alert('❌ Sorry, this time slot is no longer available. Please select a different time.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Book Appointment';
+            return;
+        }
+        
         const data = {
             ownerName: formData.get('ownerName'),
             phone: formData.get('phone'),
@@ -599,6 +611,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.setAttribute('min', today);
+        
+        // Update available times when date is selected
+        dateInput.addEventListener('change', function() {
+            if (typeof updateAvailableTimes === 'function') {
+                updateAvailableTimes();
+            }
+        });
+    }
+    
+    // Also add listener to the calendar date picker if it exists
+    const calendarDateInput = document.getElementById('appointmentDate');
+    if (calendarDateInput && calendarDateInput !== dateInput) {
+        calendarDateInput.addEventListener('change', function() {
+            if (typeof updateAvailableTimes === 'function') {
+                updateAvailableTimes();
+            }
+        });
     }
     
     const vacUpload = document.getElementById('vaccinationUpload');
@@ -634,6 +663,14 @@ const MANUALLY_BLOCKED_DATES = [
 
 // Maximum bookings per day (adjust based on your capacity)
 const MAX_BOOKINGS_PER_DAY = 3;
+
+// Global variable to store blocked times
+let blockedTimes = {};
+
+// Helper function to get blocked times for a specific date
+window.getBlockedTimesForDate = function(dateString) {
+    return blockedTimes[dateString] || [];
+};
 
 // Load booked dates from Firebase
 async function loadBookedDates() {
