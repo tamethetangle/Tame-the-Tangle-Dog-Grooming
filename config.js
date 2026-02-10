@@ -590,8 +590,7 @@ let blockedDates = [];
 
 // MANUALLY BLOCK DATES - Add your vacation/holiday dates here
 const MANUALLY_BLOCKED_DATES = [
-    // Example: '2026-02-14',  // Valentine's Day
-    // Add your dates in YYYY-MM-DD format
+    '2026-02-14',  // Test block
 ];
 
 // Maximum bookings per day (adjust based on your capacity)
