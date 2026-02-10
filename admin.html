@@ -13,6 +13,63 @@
             min-height: 100vh;
             padding: 2rem;
         }
+        
+        /* Password Protection Styles */
+        #passwordModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #passwordModal.hidden { display: none; }
+        .password-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .password-box h2 {
+            color: #00796b;
+            margin-bottom: 1.5rem;
+        }
+        .password-box input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .password-box button {
+            width: 100%;
+            padding: 1rem;
+            background: #00796b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .password-box button:hover { background: #005a4f; }
+        .password-error {
+            color: #c62828;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        #adminContent { display: none; }
+        #adminContent.unlocked { display: block; }
+        
         .container { max-width: 1400px; margin: 0 auto; }
         h1 {
             color: white;
@@ -20,6 +77,28 @@
             margin-bottom: 2rem;
             font-size: 2.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 0.75rem;
         }
         .admin-grid {
             display: grid;
@@ -98,32 +177,28 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
-            width: 100%;
-            margin-top: 1rem;
+            font-size: 1rem;
+            transition: background 0.3s;
         }
-        button:hover {
-            background: #005a4d;
-        }
+        button:hover { background: #005a4f; }
         .blocked-list {
             max-height: 400px;
             overflow-y: auto;
         }
         .blocked-item {
-            background: #ffebee;
+            background: #fff3e0;
             padding: 1rem;
             margin-bottom: 0.75rem;
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid #c62828;
+            border-left: 4px solid #f57c00;
         }
-        .blocked-item-info {
-            flex: 1;
-        }
+        .blocked-item-info { flex: 1; }
         .blocked-item-date {
             font-weight: bold;
-            color: #c62828;
+            color: #e65100;
             margin-bottom: 0.25rem;
         }
         .blocked-item-time {
@@ -138,34 +213,11 @@
             height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0;
-        }
-        .delete-btn:hover {
-            background: #b71c1c;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        .stat-number {
-            font-size: 3rem;
+            font-size: 1.5rem;
             font-weight: bold;
-            color: #00796b;
+            transition: background 0.3s;
         }
-        .stat-label {
-            color: #666;
-            margin-top: 0.75rem;
-        }
+        .delete-btn:hover { background: #8e0000; }
         .info-box {
             background: #e3f2fd;
             padding: 1rem;
@@ -181,79 +233,115 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🐕 Admin Dashboard</h1>
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalBookings">0</div>
-                <div class="stat-label">Total Bookings</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="upcomingBookings">0</div>
-                <div class="stat-label">Upcoming</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="blockedDatesCount">0</div>
-                <div class="stat-label">Blocked Dates</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="blockedTimesCount">0</div>
-                <div class="stat-label">Blocked Times</div>
-            </div>
+    <!-- Password Modal -->
+    <div id="passwordModal">
+        <div class="password-box">
+            <h2>🔒 Admin Access</h2>
+            <p style="color:#666;margin-bottom:1.5rem;">Enter password to continue</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" onkeypress="if(event.key==='Enter') checkPassword()">
+            <button onclick="checkPassword()">Unlock</button>
+            <div class="password-error" id="passwordError">❌ Incorrect password</div>
         </div>
-        <div class="admin-grid">
-            <div class="admin-card">
-                <h2>📅 Upcoming Bookings</h2>
-                <div class="bookings-list" id="bookingsList">Loading...</div>
+    </div>
+
+    <!-- Admin Content (hidden until unlocked) -->
+    <div id="adminContent">
+        <div class="container">
+            <h1>🐕 Admin Dashboard</h1>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalBookings">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="upcomingBookings">0</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="blockedDatesCount">0</div>
+                    <div class="stat-label">Blocked Dates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="blockedTimesCount">0</div>
+                    <div class="stat-label">Blocked Times</div>
+                </div>
             </div>
-            <div class="admin-card">
-                <h2>🚫 Block Dates & Times</h2>
-                
-                <div class="info-box">
-                    💡 <strong>Block entire days</strong> (vacation, holidays) or <strong>specific time slots</strong> (appointments, personal time)
+
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h2>📅 Upcoming Bookings</h2>
+                    <div class="bookings-list" id="bookingsList">Loading...</div>
                 </div>
 
-                <div class="block-form">
-                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Entire Day</h3>
-                    <div class="form-group">
-                        <label>Select Date:</label>
-                        <input type="date" id="blockWholeDay">
+                <div class="admin-card">
+                    <h2>🚫 Block Dates & Times</h2>
+                    
+                    <div class="block-form">
+                        <h3 style="margin-bottom:1rem;color:#00796b;">Block Entire Day</h3>
+                        <div class="form-group">
+                            <label>Select Date:</label>
+                            <input type="date" id="blockWholeDay">
+                        </div>
+                        <button onclick="window.blockWholeDay()">Block Entire Day</button>
                     </div>
-                    <button onclick="blockWholeDay()">🚫 Block Entire Day</button>
-                </div>
 
-                <div class="block-form">
-                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Specific Time</h3>
-                    <div class="form-group">
-                        <label>Select Date:</label>
-                        <input type="date" id="blockTimeDate">
+                    <div class="block-form">
+                        <h3 style="margin-bottom:1rem;color:#00796b;">Block Specific Time</h3>
+                        <div class="info-box">
+                            💡 Use this to block individual time slots (e.g., 3:00 PM on Feb 28th). The rest of the day stays available.
+                        </div>
+                        <div class="form-group">
+                            <label>Select Date:</label>
+                            <input type="date" id="blockTimeDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Select Time:</label>
+                            <select id="blockTimeSlot">
+                                <option value="">Choose time...</option>
+                                <option value="17:00">5:00 PM</option>
+                                <option value="17:30">5:30 PM</option>
+                                <option value="18:00">6:00 PM</option>
+                                <option value="18:30">6:30 PM</option>
+                                <option value="19:00">7:00 PM</option>
+                            </select>
+                        </div>
+                        <button onclick="window.blockSpecificTime()">Block This Time</button>
                     </div>
-                    <div class="form-group">
-                        <label>Select Time:</label>
-                        <select id="blockTimeSlot">
-                            <option value="">Choose a time...</option>
-                            <option value="09:00">9:00 AM</option>
-                            <option value="10:00">10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="13:00">1:00 PM</option>
-                            <option value="14:00">2:00 PM</option>
-                            <option value="15:00">3:00 PM</option>
-                            <option value="16:00">4:00 PM</option>
-                            <option value="17:00">5:00 PM</option>
-                            <option value="18:00">6:00 PM</option>
-                            <option value="19:00">7:00 PM</option>
-                        </select>
-                    </div>
-                    <button onclick="blockSpecificTime()">⏰ Block This Time</button>
-                </div>
 
-                <h3 style="margin: 1.5rem 0 1rem; color: #00796b;">Currently Blocked:</h3>
-                <div class="blocked-list" id="blockedList">Loading...</div>
+                    <h3 style="margin: 1.5rem 0 1rem; color: #00796b;">Currently Blocked:</h3>
+                    <div class="blocked-list" id="blockedList">Loading...</div>
+                </div>
             </div>
         </div>
     </div>
+
     <script type="module">
+        // Password Protection
+        const ADMIN_PASSWORD = 'TametheTangle2026'; // CHANGE THIS TO YOUR PASSWORD
+        
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            const error = document.getElementById('passwordError');
+            
+            if (input === ADMIN_PASSWORD) {
+                document.getElementById('passwordModal').classList.add('hidden');
+                document.getElementById('adminContent').classList.add('unlocked');
+                sessionStorage.setItem('adminUnlocked', 'true');
+            } else {
+                error.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => { error.style.display = 'none'; }, 3000);
+            }
+        }
+        window.checkPassword = checkPassword;
+        
+        // Check if already unlocked in this session
+        if (sessionStorage.getItem('adminUnlocked') === 'true') {
+            document.getElementById('passwordModal').classList.add('hidden');
+            document.getElementById('adminContent').classList.add('unlocked');
+        }
+        
+        // Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const app = initializeApp({
@@ -291,6 +379,8 @@
                             📱 ${b.phone} | 📧 ${b.email}<br>
                             💰 $${b.estimatedCost} (Deposit: $${b.depositAmount})
                             ${b.notes ? '<br>📝 '+b.notes : ''}
+                            <br><br>
+                            <button onclick="window.cancelBooking('${b.id}', '${b.ownerName}', '${b.dogName}')" style="background:#c62828;padding:0.5rem 1rem;border-radius:8px;color:white;border:none;cursor:pointer;font-weight:bold;">❌ Cancel Booking</button>
                         </div>
                     </div>
                 `).join('') : '<p style="text-align:center;color:#999;padding:2rem;">No upcoming bookings</p>';
@@ -378,6 +468,32 @@
                 alert('✅ Unblocked!');
             } catch(e) {
                 alert('Error: '+e.message);
+            }
+        };
+        
+        window.cancelBooking = async function(bookingId, ownerName, dogName) {
+            if (!confirm(`Are you sure you want to cancel ${ownerName}'s appointment for ${dogName}?
+
+⚠️ This will:
+- Delete the booking from the system
+- Free up the time slot
+- You'll need to manually refund/contact the customer
+
+Continue?`)) {
+                return;
+            }
+            
+            try {
+                await deleteDoc(doc(db, 'bookings', bookingId));
+                alert(`✅ Booking cancelled for ${dogName}!
+
+Remember to:
+- Contact ${ownerName} about the cancellation
+- Process any refund if needed`);
+                loadBookings();
+            } catch(e) {
+                alert('Error cancelling booking: ' + e.message);
+                console.error(e);
             }
         };
         
