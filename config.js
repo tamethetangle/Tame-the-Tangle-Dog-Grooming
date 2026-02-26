@@ -824,6 +824,9 @@ function selectDate(dateString) {
     renderCalendar();
 }
 
+// Expose selectDate globally so calendar can call it
+window.selectDate = selectDate;
+
 // Navigate months
 function previousMonth() {
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
@@ -834,6 +837,10 @@ function nextMonth() {
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
     renderCalendar();
 }
+
+// Expose navigation functions globally so HTML buttons can call them
+window.previousMonth = previousMonth;
+window.nextMonth = nextMonth;
 
 // Format date helper
 function formatDate(date) {
