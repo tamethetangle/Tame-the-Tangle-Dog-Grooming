@@ -812,35 +812,35 @@ function renderCalendar() {
 }
 
 // Select a date from calendar
-function selectDate(dateString) {
+// Select date - defined directly on window for HTML onclick
+window.selectDate = function(dateString) {
     selectedDate = dateString;
     
     const dateInput = document.getElementById('appointmentDate');
     if (dateInput) {
         dateInput.value = dateString;
-        updateAvailableTimes();
+        if (typeof updateAvailableTimes === 'function') {
+            updateAvailableTimes();
+        }
     }
     
     renderCalendar();
 }
 
-// Expose selectDate globally so calendar can call it
-window.selectDate = selectDate;
-
-// Navigate months
-function previousMonth() {
+// Navigate months - defined directly on window for HTML onclick
+window.previousMonth = function() {
+    console.log('Previous month clicked');
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
     renderCalendar();
 }
 
-function nextMonth() {
+window.nextMonth = function() {
+    console.log('Next month clicked');
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
     renderCalendar();
 }
 
-// Expose navigation functions globally so HTML buttons can call them
-window.previousMonth = previousMonth;
-window.nextMonth = nextMonth;
+console.log('Calendar navigation functions registered:', typeof window.nextMonth);
 
 // Format date helper
 function formatDate(date) {
