@@ -992,18 +992,38 @@
                         <input type="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label>Dog Name *</label>
-                        <input type="text" name="dogName" required>
+                        <label>Pet Type *</label>
+                        <select name="petType" id="petType" required onchange="togglePetFields()">
+                            <option value="">Select pet type</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Breed *</label>
-                    <input type="text" name="breed" required>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="inHomeGrooming" name="inHomeGrooming" onchange="toggleInHomeNote()">
+                        <span>🏠 In-Home Grooming (I would like grooming at my location)</span>
+                    </label>
+                    <div id="inHomeNote" style="display: none; background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; color: #1565c0; border-left: 4px solid #1565c0;">
+                        <strong>Note:</strong> In-home grooming is available for an additional fee. We'll contact you to discuss pricing and scheduling.
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Dog Size *</label>
+                <div class="form-row" id="petNameRow">
+                    <div class="form-group">
+                        <label><span id="petNameLabel">Dog Name</span> *</label>
+                        <input type="text" name="dogName" id="petName" required>
+                    </div>
+                    <div class="form-group" id="breedGroup">
+                        <label><span id="breedLabel">Breed</span> *</label>
+                        <input type="text" name="breed" id="breed" required>
+                    </div>
+                </div>
+
+                <div class="form-group" id="sizeGroup">
+                    <label><span id="sizeLabel">Dog Size</span> *</label>
                     <select name="size" id="dogSize" required onchange="updateAppointmentDuration()">
                         <option value="">Select size</option>
                         <option value="small" data-hours="2">Small (Under 20 lbs) - $40+ (2 hour appointment)</option>
@@ -1012,11 +1032,11 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="mattedGroup">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; background: #fff3cd; padding: 1rem; border-radius: 8px; border: 2px solid #ffc107;">
                         <input type="checkbox" id="isMatted" name="isMatted" onchange="updateAppointmentDuration()">
                         <span style="flex: 1;">
-                            <strong style="color: #856404;">⚠️ My dog has matted fur</strong><br>
+                            <strong style="color: #856404;">⚠️ My <span id="mattedPetType">dog</span> has matted fur</strong><br>
                             <small style="color: #856404;">This adds an extra hour to your appointment and may incur additional charges</small>
                         </span>
                     </label>
@@ -1118,7 +1138,7 @@
                     <p style="margin: 0 0 1rem 0; color: #856404; font-size: 0.9rem;">
                         All first-time clients must complete our waiver form before booking. This only takes 2-3 minutes.
                     </p>
-                    <a href="https://forms.zoho.com/tamethetangledoggrooming1/form/TametheTangleGroomingWaiver" 
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeMbMuNFmu9k3b_lsiCFX4SuZcw2xtdaqCzanoDvn2XCgkfeA/viewform" 
                        target="_blank" 
                        style="display: inline-block; background: #00796b; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: bold;">
                         📋 Complete Waiver Form (Opens in New Tab)
@@ -1191,7 +1211,7 @@
                         <span class="contact-icon">📧</span>
                         <div>
                             <strong>Email</strong><br>
-                            <a href="mailto:tamethetangledoggrooming@gmail.com">tamethetangledoggrooming@gmail.com</a>
+                            <a href="/cdn-cgi/l/email-protection#f783969a92839f92839699909b92939890908598989a9e9990b7909a969e9bd994989a"><span class="__cf_email__" data-cfemail="7c081d1119081419081d121b101918131b1b0e13131115121b3c1b111d1510521f1311">[email&#160;protected]</span></a>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1227,7 +1247,7 @@
         <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         function updateAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
             const mattedCheckbox = document.getElementById('isMatted');
@@ -1358,6 +1378,45 @@
             }
         }
         
+        function togglePetFields() {
+            const petType = document.getElementById('petType').value;
+            const breedGroup = document.getElementById('breedGroup');
+            const breedInput = document.getElementById('breed');
+            const petNameLabel = document.getElementById('petNameLabel');
+            const breedLabel = document.getElementById('breedLabel');
+            const sizeLabel = document.getElementById('sizeLabel');
+            const mattedPetType = document.getElementById('mattedPetType');
+            
+            if (petType === 'cat') {
+                // For cats, breed is optional
+                petNameLabel.textContent = 'Cat Name';
+                breedLabel.textContent = 'Breed';
+                sizeLabel.textContent = 'Cat Size';
+                mattedPetType.textContent = 'cat';
+                breedInput.required = false;
+                breedGroup.style.opacity = '0.6';
+            } else if (petType === 'dog') {
+                // For dogs, breed is required
+                petNameLabel.textContent = 'Dog Name';
+                breedLabel.textContent = 'Breed';
+                sizeLabel.textContent = 'Dog Size';
+                mattedPetType.textContent = 'dog';
+                breedInput.required = true;
+                breedGroup.style.opacity = '1';
+            }
+        }
+        
+        function toggleInHomeNote() {
+            const inHomeCheckbox = document.getElementById('inHomeGrooming');
+            const inHomeNote = document.getElementById('inHomeNote');
+            
+            if (inHomeCheckbox && inHomeCheckbox.checked) {
+                if (inHomeNote) inHomeNote.style.display = 'block';
+            } else {
+                if (inHomeNote) inHomeNote.style.display = 'none';
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.getElementById('appointmentDate');
             if (dateInput) {
@@ -1365,16 +1424,7 @@
                 dateInput.setAttribute('min', today);
             }
         });
-   </script>
-
-    <!-- Firebase SDK -->
+    </script>
+   <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Your config.js file -->
-    <script src="config.js"></script>
-</body>
-</html>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/fi
