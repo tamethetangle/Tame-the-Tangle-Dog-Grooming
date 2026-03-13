@@ -1242,12 +1242,130 @@
         </div>
     </section>
 
+    <!-- Website Feedback Section -->
+    <section id="feedback" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 4rem 2rem; color: white;">
+        <div class="container" style="max-width: 600px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">💭 Website Feedback</h2>
+            <p style="text-align: center; margin-bottom: 2rem; opacity: 0.9;">Help us improve! Let us know what you think about our website.</p>
+            
+            <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <form id="feedbackForm" onsubmit="submitFeedback(event)" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label style="color: #333; font-weight: bold; margin-bottom: 0.5rem; display: block;">How would you rate this website? *</label>
+                        <div id="starRating" style="display: flex; gap: 0.5rem; font-size: 2.5rem; cursor: pointer; justify-content: center;">
+                            <span class="star" data-rating="1" onclick="setRating(1)">☆</span>
+                            <span class="star" data-rating="2" onclick="setRating(2)">☆</span>
+                            <span class="star" data-rating="3" onclick="setRating(3)">☆</span>
+                            <span class="star" data-rating="4" onclick="setRating(4)">☆</span>
+                            <span class="star" data-rating="5" onclick="setRating(5)">☆</span>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" required>
+                    </div>
+                    
+                    <div>
+                        <label style="color: #333; font-weight: bold; margin-bottom: 0.5rem; display: block;">What did you like about the website?</label>
+                        <textarea name="likes" rows="3" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; resize: vertical;" placeholder="What works well?"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label style="color: #333; font-weight: bold; margin-bottom: 0.5rem; display: block;">What could be improved?</label>
+                        <textarea name="improvements" rows="3" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; resize: vertical;" placeholder="Any bugs or issues?"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label style="color: #333; font-weight: bold; margin-bottom: 0.5rem; display: block;">Additional Comments or Suggestions</label>
+                        <textarea name="comments" rows="4" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; resize: vertical;" placeholder="Any other feedback?"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label style="color: #333; font-weight: bold; margin-bottom: 0.5rem; display: block;">Your Email (optional)</label>
+                        <input type="email" name="email" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit;" placeholder="If you'd like a response">
+                    </div>
+                    
+                    <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;">
+                        Submit Feedback
+                    </button>
+                    
+                    <div id="feedbackSuccess" style="display: none; background: #4caf50; color: white; padding: 1rem; border-radius: 8px; text-align: center; font-weight: bold;">
+                        ✅ Thank you for your feedback! We appreciate your input.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let selectedRating = 0;
+        
+        function setRating(rating) {
+            selectedRating = rating;
+            document.getElementById('rating').value = rating;
+            
+            // Update star display
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.textContent = '★';
+                    star.style.color = '#ffd700';
+                } else {
+                    star.textContent = '☆';
+                    star.style.color = '#333';
+                }
+            });
+        }
+        
+        async function submitFeedback(event) {
+            event.preventDefault();
+            
+            if (!selectedRating) {
+                alert('Please select a star rating before submitting.');
+                return;
+            }
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const feedbackData = {
+                rating: selectedRating,
+                likes: formData.get('likes'),
+                improvements: formData.get('improvements'),
+                comments: formData.get('comments'),
+                email: formData.get('email'),
+                submittedAt: new Date().toISOString(),
+                page: 'Website Feedback'
+            };
+            
+            try {
+                // Save to Firebase
+                if (typeof db !== 'undefined' && db) {
+                    await db.collection('website-feedback').add(feedbackData);
+                } else {
+                    console.log('Feedback:', feedbackData);
+                }
+                
+                // Show success message
+                document.getElementById('feedbackSuccess').style.display = 'block';
+                form.reset();
+                selectedRating = 0;
+                setRating(0);
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('feedbackSuccess').style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('There was an error submitting your feedback. Please try again or contact us directly.');
+            }
+        }
+    </script>
+
     <footer>
     <footer>
         <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
     </footer>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         function updateAppointmentDuration() {
             const sizeSelect = document.getElementById('dogSize');
             const mattedCheckbox = document.getElementById('isMatted');
@@ -1436,13 +1554,14 @@
     <!-- Config.js -->
     <script src="config.js"></script>
     
+    
     <!-- Tawk.to Live Chat Widget -->
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
     var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
     s1.async=true;
-    s1.src='https://embed.tawk.to/65f9a1e68d261e1b5f5c8e6a/1hpa9q7ct';
+    s1.src='https://embed.tawk.to/69b414617afc871c37be170f/1jjjmv74g';
     s1.charset='UTF-8';
     s1.setAttribute('crossorigin','*');
     s0.parentNode.insertBefore(s1,s0);
