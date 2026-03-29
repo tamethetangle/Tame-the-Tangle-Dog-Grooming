@@ -416,9 +416,12 @@ async function handleBooking(event) {
             ownerName: formData.get('ownerName'),
             phone: formData.get('phone'),
             email: formData.get('email'),
-            dogName: formData.get('dogName'),
-            breed: formData.get('breed'),
+            petType: formData.get('petType'),
+            petName: formData.get('petName'),
+            dogName: formData.get('petName'), // Keep for backwards compatibility
+            breed: formData.get('breed') || 'Not specified',
             size: formData.get('size'),
+            serviceLocation: formData.get('serviceLocation'),
             date: formData.get('date'),
             time: formData.get('time'),
             extraTime: formData.get('extraTime'),
@@ -481,6 +484,9 @@ async function handleBooking(event) {
         await sendNotificationEmail(data);
         
         // Success!
+        const petTypeText = data.petType === 'cat' ? 'Cat' : 'Dog';
+        const locationText = data.serviceLocation === 'in-home' ? 'In-Home Visit' : 'In-Salon';
+        
         alert(`✅ Appointment Confirmed!
 
 Thank you, ${data.ownerName}!
@@ -489,13 +495,14 @@ Thank you, ${data.ownerName}!
 Card: ${data.cardBrand} ending in ${data.cardLast4}
 
 Appointment Details:
-• Dog: ${data.dogName} (${data.breed})
+• ${petTypeText}: ${data.petName} ${data.breed ? '(' + data.breed + ')' : ''}
+• Location: ${locationText}
 • Date: ${data.date}
 • Time: ${data.time}
 • Duration: ${duration} hours
 
 Pricing (Starting Estimate):
-• Estimated Total: $${estimatedCost}
+• Estimated Total: $${estimatedCost}${data.serviceLocation === 'in-home' ? ' + in-home fee' : ''}
 • Deposit Paid Today: $${depositAmount}
 • Balance Due at Appointment: $${data.balanceDue}
 
@@ -503,7 +510,7 @@ Pricing (Starting Estimate):
 
 📧 Confirmation email sent to: ${data.email}
 
-We look forward to pampering ${data.dogName}!`);
+We look forward to pampering ${data.petName}!`);
         
         event.target.reset();
         
