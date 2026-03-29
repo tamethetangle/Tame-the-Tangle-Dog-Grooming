@@ -8,6 +8,9 @@
     <!-- Stripe.js -->
     <script src="https://js.stripe.com/v3/"></script>
     
+    <!-- Google Maps API for Distance Calculation -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKEm1AnfJn7ovvDLvVMl9shmSLL-PUUAo&libraries=places"></script>
+    
     <style>
         * {
             margin: 0;
@@ -986,6 +989,11 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Address *</label>
+                    <input type="text" name="address" id="customerAddress" required placeholder="123 Main St, City, State ZIP">
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Email *</label>
@@ -1003,11 +1011,24 @@
 
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" id="inHomeGrooming" name="inHomeGrooming" onchange="toggleInHomeNote()">
+                        <input type="checkbox" id="inHomeGrooming" name="inHomeGrooming" onchange="toggleInHomeGrooming()">
                         <span>🏠 In-Home Grooming (I would like grooming at my location)</span>
                     </label>
                     <div id="inHomeNote" style="display: none; background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; color: #1565c0; border-left: 4px solid #1565c0;">
-                        <strong>Note:</strong> In-home grooming is available for an additional fee. We'll contact you to discuss pricing and scheduling.
+                        <div style="margin-bottom: 1rem;">
+                            <strong>📏 Travel Fee Calculator</strong><br>
+                            <small>We'll calculate the distance from your address to our nearest location.</small>
+                        </div>
+                        <button type="button" onclick="calculateDistance()" style="background: #1565c0; color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 1rem;">
+                            Calculate Travel Fee
+                        </button>
+                        <div id="distanceResult" style="display: none; padding: 1rem; background: white; border-radius: 8px; margin-top: 0.5rem;">
+                            <div style="color: #333; font-weight: bold;" id="distanceText"></div>
+                            <div style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;" id="feeText"></div>
+                        </div>
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; border-radius: 4px;">
+                            <strong>⚠️ Travel Fee:</strong> $0.30 per mile (round trip), $10 minimum charge
+                        </div>
                     </div>
                 </div>
 
@@ -1211,7 +1232,7 @@
                         <span class="contact-icon">📧</span>
                         <div>
                             <strong>Email</strong><br>
-                            <a href="/cdn-cgi/l/email-protection#790d18141c0d111c0d18171e151c1d161e1e0b16161410171e391e14181015571a1614"><span class="__cf_email__" data-cfemail="7501141810011d1001141b121910111a1212071a1a181c1b12351218141c195b161a18">[email&#160;protected]</span></a>
+                            <a href="/cdn-cgi/l/email-protection#eb9f8a868e9f838e9f8a858c878e8f848c8c9984848682858cab8c868a8287c5888486"><span class="__cf_email__" data-cfemail="93e7f2fef6e7fbf6e7f2fdf4fff6f7fcf4f4e1fcfcfefafdf4d3f4fef2faffbdf0fcfe">[email&#160;protected]</span></a>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1293,7 +1314,7 @@
         </div>
     </section>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         let selectedRating = 0;
         
         function setRating(rating) {
@@ -1362,6 +1383,7 @@
     <footer>
     <footer>
         <p>&copy; 2026 Tame the Tangle Dog Grooming. All rights reserved.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Website made by Ariel (owner of Tame the Tangle)</p>
     </footer>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1523,7 +1545,7 @@
             }
         }
         
-        function toggleInHomeNote() {
+        function toggleInHomeGrooming() {
             const inHomeCheckbox = document.getElementById('inHomeGrooming');
             const inHomeNote = document.getElementById('inHomeNote');
             
@@ -1531,6 +1553,92 @@
                 if (inHomeNote) inHomeNote.style.display = 'block';
             } else {
                 if (inHomeNote) inHomeNote.style.display = 'none';
+            }
+        }
+        
+        async function calculateDistance() {
+            const address = document.getElementById('customerAddress').value;
+            
+            if (!address) {
+                alert('Please enter your address first.');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('distanceResult');
+            const distanceText = document.getElementById('distanceText');
+            const feeText = document.getElementById('feeText');
+            
+            // Show loading
+            resultDiv.style.display = 'block';
+            distanceText.textContent = 'Calculating distance...';
+            feeText.textContent = '';
+            
+            try {
+                // Our two locations
+                const reidsville = '1318 Harrison Crossroad Loop, Reidsville, NC';
+                const highpoint = 'High Point, NC';
+                
+                // Use Google Maps Distance Matrix API
+                const service = new google.maps.DistanceMatrixService();
+                
+                const request = {
+                    origins: [address],
+                    destinations: [reidsville, highpoint],
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.IMPERIAL,
+                };
+                
+                service.getDistanceMatrix(request, (response, status) => {
+                    if (status === 'OK') {
+                        const results = response.rows[0].elements;
+                        
+                        // Get distances in miles
+                        const distReidsville = results[0].distance ? results[0].distance.value * 0.000621371 : null;
+                        const distHighPoint = results[1].distance ? results[1].distance.value * 0.000621371 : null;
+                        
+                        if (distReidsville === null && distHighPoint === null) {
+                            distanceText.textContent = '❌ Could not calculate distance. Please check your address.';
+                            feeText.textContent = '';
+                            return;
+                        }
+                        
+                        // Find closest location
+                        let closestDistance, closestLocation;
+                        if (distReidsville && distHighPoint) {
+                            if (distReidsville < distHighPoint) {
+                                closestDistance = distReidsville;
+                                closestLocation = 'Reidsville';
+                            } else {
+                                closestDistance = distHighPoint;
+                                closestLocation = 'High Point';
+                            }
+                        } else if (distReidsville) {
+                            closestDistance = distReidsville;
+                            closestLocation = 'Reidsville';
+                        } else {
+                            closestDistance = distHighPoint;
+                            closestLocation = 'High Point';
+                        }
+                        
+                        // Calculate fee: $0.30 per mile for ROUND TRIP, $10 minimum
+                        const roundTripDistance = closestDistance * 2; // To client and back
+                        const calculatedFee = roundTripDistance * 0.30;
+                        const travelFee = Math.max(calculatedFee, 10);
+                        
+                        // Display results
+                        distanceText.textContent = `📍 Distance from ${closestLocation}: ${closestDistance.toFixed(1)} miles one way (${roundTripDistance.toFixed(1)} miles round trip)`;
+                        feeText.textContent = `💰 Travel Fee: $${travelFee.toFixed(2)} ($0.30/mile round trip, $10 minimum)`;
+                        
+                    } else {
+                        distanceText.textContent = '❌ Error calculating distance. Please verify your address is complete.';
+                        feeText.textContent = 'Make sure to include city and state in your address.';
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Distance calculation error:', error);
+                distanceText.textContent = '❌ Unable to calculate distance at this time.';
+                feeText.textContent = 'We will contact you to discuss travel fees.';
             }
         }
         
@@ -1549,13 +1657,4 @@
     
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Config.js -->
-    <script src="config.js"></script>
-    
-    
-    <!-- Tawk.to Live Chat Widget -->
-    <script type="text/javascript">
-    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-    (function(){
-    var s1=document.createElement("script"),s0=docu
+   
