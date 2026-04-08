@@ -628,7 +628,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeStripe();
     initializeFirebase();
-    initializeEmailJS();
+    
+    // Retry EmailJS init in case CDN script hasn't loaded yet
+    function tryInitEmailJS(attempts) {
+        attempts = attempts || 0;
+        if (typeof emailjs !== 'undefined') {
+            initializeEmailJS();
+        } else if (attempts < 10) {
+            setTimeout(function() { tryInitEmailJS(attempts + 1); }, 300);
+        } else {
+            console.error('❌ EmailJS failed to load after multiple attempts. Check your internet connection or CDN.');
+        }
+    }
+    tryInitEmailJS();
     
     const dateInput = document.querySelector('input[name="date"]');
     if (dateInput) {
