@@ -482,10 +482,16 @@ async function handleBooking(event) {
         const booking = await saveBookingToFirebase(data);
         data.bookingId = booking.id;
         
-        // Send emails
+        // Send emails (don't let email errors break the booking)
         submitBtn.textContent = 'Sending confirmation...';
-        await sendConfirmationEmail(data);
-        await sendNotificationEmail(data);
+        try {
+            await sendConfirmationEmail(data);
+            await sendNotificationEmail(data);
+            console.log('✅ Emails sent successfully');
+        } catch (emailError) {
+            console.error('⚠️ Email sending failed, but booking was successful:', emailError);
+            // Continue anyway - booking is already saved and paid
+        }
         
         // Success!
         const petTypeText = data.petType === 'cat' ? 'Cat' : 'Dog';
@@ -526,7 +532,13 @@ We look forward to pampering ${data.petName}!`);
         
     } catch (error) {
         console.error('Booking error:', error);
-        alert('Error processing booking: ' + error.message + '\n\nYour card was not charged. Please try again or call 336-582-2884');
+        
+        // Check if payment already went through
+        if (data.paymentIntentId) {
+            alert('⚠️ Payment was processed successfully, but there was an error completing your booking.\n\n💳 Deposit charged: $' + depositAmount + '\nPayment ID: ' + data.paymentIntentId + '\n\nPlease call us at 336-582-2884 to confirm your appointment.\nYour payment will not be charged again.');
+        } else {
+            alert('Error processing booking: ' + error.message + '\n\nYour card was not charged. Please try again or call 336-582-2884');
+        }
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Book Appointment';
