@@ -303,12 +303,13 @@ function initializeEmailJS() {
 }
 
 async function sendConfirmationEmail(bookingData) {
-    if (!emailjs || CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
-        console.log("Would send confirmation email to:", bookingData.email);
+    if (typeof emailjs === 'undefined' || !emailjs || CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
+        console.log("EmailJS not available. Would send confirmation email to:", bookingData.email);
         return;
     }
     
     try {
+        console.log('📧 Sending confirmation email to:', bookingData.email);
         await emailjs.send(
             CONFIG.emailjs.serviceId,
             CONFIG.emailjs.templates.confirmation,
@@ -324,19 +325,21 @@ async function sendConfirmationEmail(bookingData) {
                 estimated_total: bookingData.estimatedCost
             }
         );
-        console.log("Confirmation email sent!");
+        console.log("✅ Confirmation email sent successfully!");
     } catch (error) {
-        console.error("Email error:", error);
+        console.error("❌ Confirmation email error:", error);
+        console.error("Error details:", error.text || error.message);
     }
 }
 
 async function sendNotificationEmail(bookingData) {
-    if (!emailjs || CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
-        console.log("Would send notification about:", bookingData.dogName);
+    if (typeof emailjs === 'undefined' || !emailjs || CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY") {
+        console.log("EmailJS not available. Would send notification about:", bookingData.dogName);
         return;
     }
     
     try {
+        console.log('📧 Sending notification email about:', bookingData.dogName);
         await emailjs.send(
             CONFIG.emailjs.serviceId,
             CONFIG.emailjs.templates.notification,
@@ -345,9 +348,10 @@ async function sendNotificationEmail(bookingData) {
                 to_email: 'tamethetangledoggrooming@gmail.com'
             }
         );
-        console.log("Notification email sent!");
+        console.log("✅ Notification email sent successfully!");
     } catch (error) {
-        console.error("Email error:", error);
+        console.error("❌ Notification email error:", error);
+        console.error("Error details:", error.text || error.message);
     }
 }
 
