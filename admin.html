@@ -13,63 +13,6 @@
             min-height: 100vh;
             padding: 2rem;
         }
-        
-        /* Password Protection Styles */
-        #passwordModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        #passwordModal.hidden { display: none; }
-        .password-box {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .password-box h2 {
-            color: #00796b;
-            margin-bottom: 1.5rem;
-        }
-        .password-box input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-        .password-box button {
-            width: 100%;
-            padding: 1rem;
-            background: #00796b;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .password-box button:hover { background: #005a4f; }
-        .password-error {
-            color: #c62828;
-            margin-top: 1rem;
-            display: none;
-        }
-        
-        #adminContent { display: none; }
-        #adminContent.unlocked { display: block; }
-        
         .container { max-width: 1400px; margin: 0 auto; }
         h1 {
             color: white;
@@ -77,28 +20,6 @@
             margin-bottom: 2rem;
             font-size: 2.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        }
-        .stat-number {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #00796b;
-        }
-        .stat-label {
-            color: #666;
-            margin-top: 0.75rem;
         }
         .admin-grid {
             display: grid;
@@ -177,28 +98,32 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
-            transition: background 0.3s;
+            width: 100%;
+            margin-top: 1rem;
         }
-        button:hover { background: #005a4f; }
+        button:hover {
+            background: #005a4d;
+        }
         .blocked-list {
             max-height: 400px;
             overflow-y: auto;
         }
         .blocked-item {
-            background: #fff3e0;
+            background: #ffebee;
             padding: 1rem;
             margin-bottom: 0.75rem;
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid #f57c00;
+            border-left: 4px solid #c62828;
         }
-        .blocked-item-info { flex: 1; }
+        .blocked-item-info {
+            flex: 1;
+        }
         .blocked-item-date {
             font-weight: bold;
-            color: #e65100;
+            color: #c62828;
             margin-bottom: 0.25rem;
         }
         .blocked-item-time {
@@ -213,11 +138,34 @@
             height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.5rem;
-            font-weight: bold;
-            transition: background 0.3s;
+            font-size: 1.2rem;
+            padding: 0;
         }
-        .delete-btn:hover { background: #8e0000; }
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00796b;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 0.75rem;
+        }
         .info-box {
             background: #e3f2fd;
             padding: 1rem;
@@ -233,115 +181,118 @@
     </style>
 </head>
 <body>
-    <!-- Password Modal -->
-    <div id="passwordModal">
-        <div class="password-box">
-            <h2>🔒 Admin Access</h2>
-            <p style="color:#666;margin-bottom:1.5rem;">Enter password to continue</p>
-            <input type="password" id="passwordInput" placeholder="Enter password" onkeypress="if(event.key==='Enter') checkPassword()">
-            <button onclick="checkPassword()">Unlock</button>
-            <div class="password-error" id="passwordError">❌ Incorrect password</div>
+    <div class="container">
+        <h1>🐕 Admin Dashboard</h1>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="upcomingBookings">0</div>
+                <div class="stat-label">Upcoming</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="blockedDatesCount">0</div>
+                <div class="stat-label">Blocked Dates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="blockedTimesCount">0</div>
+                <div class="stat-label">Blocked Times</div>
+            </div>
         </div>
-    </div>
-
-    <!-- Admin Content (hidden until unlocked) -->
-    <div id="adminContent">
-        <div class="container">
-            <h1>🐕 Admin Dashboard</h1>
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalBookings">0</div>
-                    <div class="stat-label">Total Bookings</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="upcomingBookings">0</div>
-                    <div class="stat-label">Upcoming</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="blockedDatesCount">0</div>
-                    <div class="stat-label">Blocked Dates</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="blockedTimesCount">0</div>
-                    <div class="stat-label">Blocked Times</div>
-                </div>
+        <div class="admin-grid">
+            <div class="admin-card">
+                <h2>📅 Upcoming Bookings</h2>
+                <div class="bookings-list" id="bookingsList">Loading...</div>
             </div>
 
-            <div class="admin-grid">
-                <div class="admin-card">
-                    <h2>📅 Upcoming Bookings</h2>
-                    <div class="bookings-list" id="bookingsList">Loading...</div>
-                </div>
-
-                <div class="admin-card">
-                    <h2>🚫 Block Dates & Times</h2>
+            <!-- ALL BOOKINGS WITH SEARCH -->
+            <div class="admin-card">
+                <h2>🔍 Search All Bookings</h2>
+                
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <div class="form-row" style="gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" id="searchQuery" placeholder="Search by name, dog, phone, email..." 
+                               onkeyup="searchBookings()" style="flex: 2;">
+                        <input type="month" id="searchMonth" onchange="searchBookings()" 
+                               style="flex: 1;" placeholder="Filter by month">
+                        <button onclick="clearSearch()" style="background: #666; padding: 0.875rem 1.5rem;">
+                            Clear
+                        </button>
+                    </div>
                     
-                    <div class="block-form">
-                        <h3 style="margin-bottom:1rem;color:#00796b;">Block Entire Day</h3>
-                        <div class="form-group">
-                            <label>Select Date:</label>
-                            <input type="date" id="blockWholeDay">
-                        </div>
-                        <button onclick="window.blockWholeDay()">Block Entire Day</button>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="showPast" onchange="searchBookings()" checked>
+                            <span>Show Past</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="showUpcoming" onchange="searchBookings()" checked>
+                            <span>Show Upcoming</span>
+                        </label>
                     </div>
-
-                    <div class="block-form">
-                        <h3 style="margin-bottom:1rem;color:#00796b;">Block Specific Time</h3>
-                        <div class="info-box">
-                            💡 Use this to block individual time slots (e.g., 3:00 PM on Feb 28th). The rest of the day stays available.
-                        </div>
-                        <div class="form-group">
-                            <label>Select Date:</label>
-                            <input type="date" id="blockTimeDate">
-                        </div>
-                        <div class="form-group">
-                            <label>Select Time:</label>
-                            <select id="blockTimeSlot">
-                                <option value="">Choose time...</option>
-                                <option value="17:00">5:00 PM</option>
-                                <option value="17:30">5:30 PM</option>
-                                <option value="18:00">6:00 PM</option>
-                                <option value="18:30">6:30 PM</option>
-                                <option value="19:00">7:00 PM</option>
-                            </select>
-                        </div>
-                        <button onclick="window.blockSpecificTime()">Block This Time</button>
-                    </div>
-
-                    <h3 style="margin: 1.5rem 0 1rem; color: #00796b;">Currently Blocked:</h3>
-                    <div class="blocked-list" id="blockedList">Loading...</div>
                 </div>
+
+                <div id="searchResults" style="margin-top: 1rem;">
+                    <p style="text-align: center; color: #999; padding: 2rem;">
+                        Enter search term or select a month to find bookings
+                    </p>
+                </div>
+
+                <div id="searchStats" style="margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; display: none;">
+                    <strong>Results:</strong> <span id="resultCount">0</span> bookings found
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h2>🚫 Block Dates & Times</h2>
+                
+                <div class="info-box">
+                    💡 <strong>Block entire days</strong> (vacation, holidays) or <strong>specific time slots</strong> (appointments, personal time)
+                </div>
+
+                <div class="block-form">
+                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Entire Day</h3>
+                    <div class="form-group">
+                        <label>Select Date:</label>
+                        <input type="date" id="blockWholeDay">
+                    </div>
+                    <button onclick="blockWholeDay()">🚫 Block Entire Day</button>
+                </div>
+
+                <div class="block-form">
+                    <h3 style="margin-bottom: 1rem; color: #00796b;">Block Specific Time</h3>
+                    <div class="form-group">
+                        <label>Select Date:</label>
+                        <input type="date" id="blockTimeDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Time:</label>
+                        <select id="blockTimeSlot">
+                            <option value="">Choose a time...</option>
+                            <option value="09:00">9:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">1:00 PM</option>
+                            <option value="14:00">2:00 PM</option>
+                            <option value="15:00">3:00 PM</option>
+                            <option value="16:00">4:00 PM</option>
+                            <option value="17:00">5:00 PM</option>
+                            <option value="18:00">6:00 PM</option>
+                            <option value="19:00">7:00 PM</option>
+                        </select>
+                    </div>
+                    <button onclick="blockSpecificTime()">⏰ Block This Time</button>
+                </div>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: #00796b;">Currently Blocked:</h3>
+                <div class="blocked-list" id="blockedList">Loading...</div>
             </div>
         </div>
     </div>
-
     <script type="module">
-        // Password Protection
-        const ADMIN_PASSWORD = 'TametheTangle2026'; // CHANGE THIS TO YOUR PASSWORD
-        
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const error = document.getElementById('passwordError');
-            
-            if (input === ADMIN_PASSWORD) {
-                document.getElementById('passwordModal').classList.add('hidden');
-                document.getElementById('adminContent').classList.add('unlocked');
-                sessionStorage.setItem('adminUnlocked', 'true');
-            } else {
-                error.style.display = 'block';
-                document.getElementById('passwordInput').value = '';
-                setTimeout(() => { error.style.display = 'none'; }, 3000);
-            }
-        }
-        window.checkPassword = checkPassword;
-        
-        // Check if already unlocked in this session
-        if (sessionStorage.getItem('adminUnlocked') === 'true') {
-            document.getElementById('passwordModal').classList.add('hidden');
-            document.getElementById('adminContent').classList.add('unlocked');
-        }
-        
-        // Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const app = initializeApp({
@@ -379,8 +330,6 @@
                             📱 ${b.phone} | 📧 ${b.email}<br>
                             💰 $${b.estimatedCost} (Deposit: $${b.depositAmount})
                             ${b.notes ? '<br>📝 '+b.notes : ''}
-                            <br><br>
-                            <button onclick="window.cancelBooking('${b.id}', '${b.ownerName}', '${b.dogName}')" style="background:#c62828;padding:0.5rem 1rem;border-radius:8px;color:white;border:none;cursor:pointer;font-weight:bold;">❌ Cancel Booking</button>
                         </div>
                     </div>
                 `).join('') : '<p style="text-align:center;color:#999;padding:2rem;">No upcoming bookings</p>';
@@ -471,52 +420,6 @@
             }
         };
         
-        window.cancelBooking = async function(bookingId, ownerName, dogName) {
-            if (!confirm(`Are you sure you want to cancel ${ownerName}'s appointment for ${dogName}?
-
-⚠️ This will:
-- Delete the booking from the system
-- Free up ALL time slots for this appointment
-- You'll need to manually refund/contact the customer
-
-Continue?`)) {
-                return;
-            }
-            
-            try {
-                // First, delete all blocked time slots associated with this booking
-                const blockedQuery = query(
-                    collection(db, 'blocked-dates'),
-                    where('bookingId', '==', bookingId)
-                );
-                const blockedSnap = await getDocs(blockedQuery);
-                
-                // Delete all associated blocked time slots
-                const deletePromises = [];
-                blockedSnap.forEach((doc) => {
-                    deletePromises.push(deleteDoc(doc.ref));
-                });
-                await Promise.all(deletePromises);
-                
-                // Then delete the booking
-                await deleteDoc(doc(db, 'bookings', bookingId));
-                
-                alert(`✅ Booking cancelled for ${dogName}!
-
-Removed booking and freed up ${blockedSnap.size} time slot(s).
-
-Remember to:
-- Contact ${ownerName} about the cancellation
-- Process any refund if needed`);
-                
-                loadBookings();
-                loadBlocked(); // Refresh blocked times list
-            } catch(e) {
-                alert('Error cancelling booking: ' + e.message);
-                console.error(e);
-            }
-        };
-        
         function formatDate(dateString) {
             const date = new Date(dateString+'T00:00:00');
             return date.toLocaleDateString('en-US', {weekday:'short', year:'numeric', month:'short', day:'numeric'});
@@ -528,9 +431,120 @@ Remember to:
             return `${hour%12||12}:${m} ${hour<12?'AM':'PM'}`;
         }
         
+        // ============================================
+        // SEARCH ALL BOOKINGS
+        // ============================================
+        let allBookingsCache = [];
+        
+        async function loadAllBookings() {
+            try {
+                const q = query(collection(db, 'bookings'), orderBy('date', 'desc'));
+                const snap = await getDocs(q);
+                allBookingsCache = [];
+                snap.forEach(d => {
+                    allBookingsCache.push({id: d.id, ...d.data()});
+                });
+                console.log(`📚 Loaded ${allBookingsCache.length} total bookings`);
+            } catch(e) {
+                console.error('Error loading all bookings:', e);
+            }
+        }
+        
+        async function searchBookings() {
+            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+            const searchMonth = document.getElementById('searchMonth').value; // Format: YYYY-MM
+            const showPast = document.getElementById('showPast').checked;
+            const showUpcoming = document.getElementById('showUpcoming').checked;
+            
+            if (allBookingsCache.length === 0) {
+                await loadAllBookings();
+            }
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            let results = allBookingsCache.filter(b => {
+                // Date filter
+                const bookingDate = new Date(b.date + 'T00:00:00');
+                const isPast = bookingDate < today;
+                const isUpcoming = bookingDate >= today;
+                
+                if (!showPast && isPast) return false;
+                if (!showUpcoming && isUpcoming) return false;
+                
+                // Month filter
+                if (searchMonth) {
+                    const bookingMonth = b.date.substring(0, 7); // Get YYYY-MM
+                    if (bookingMonth !== searchMonth) return false;
+                }
+                
+                // Text search
+                if (searchQuery) {
+                    const searchText = `${b.ownerName} ${b.dogName} ${b.phone} ${b.email} ${b.breed} ${b.date}`.toLowerCase();
+                    if (!searchText.includes(searchQuery)) return false;
+                }
+                
+                return true;
+            });
+            
+            displaySearchResults(results);
+        }
+        
+        function displaySearchResults(results) {
+            const resultsDiv = document.getElementById('searchResults');
+            const statsDiv = document.getElementById('searchStats');
+            const countSpan = document.getElementById('resultCount');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">No bookings found</p>';
+                statsDiv.style.display = 'none';
+                return;
+            }
+            
+            countSpan.textContent = results.length;
+            statsDiv.style.display = 'block';
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            resultsDiv.innerHTML = results.map(b => {
+                const bookingDate = new Date(b.date + 'T00:00:00');
+                const isPast = bookingDate < today;
+                const bgColor = isPast ? '#f5f5f5' : '#ffffff';
+                const borderColor = isPast ? '#ccc' : '#00796b';
+                
+                return `
+                    <div class="booking-item" style="background: ${bgColor}; border-left-color: ${borderColor}; opacity: ${isPast ? '0.7' : '1'};">
+                        <div class="booking-date">
+                            ${isPast ? '📂' : '📅'} ${formatDate(b.date)} at ${formatTime(b.time)}
+                            ${isPast ? '<span style="color:#999;font-size:0.9rem;margin-left:0.5rem;">(Past)</span>' : ''}
+                        </div>
+                        <div class="booking-details">
+                            <strong>${b.ownerName}</strong> - ${b.dogName} (${b.breed})<br>
+                            📱 ${b.phone} | 📧 ${b.email}<br>
+                            🐕 Size: ${b.size.charAt(0).toUpperCase() + b.size.slice(1)} | 
+                            💰 $${b.estimatedCost} (Deposit: $${b.depositAmount})
+                            ${b.notes ? '<br>📝 ' + b.notes : ''}
+                            ${b.isMatted ? '<br>⚠️ Matted fur noted' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchQuery').value = '';
+            document.getElementById('searchMonth').value = '';
+            document.getElementById('showPast').checked = true;
+            document.getElementById('showUpcoming').checked = true;
+            document.getElementById('searchResults').innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Enter search term or select a month to find bookings</p>';
+            document.getElementById('searchStats').style.display = 'none';
+        }
+        
         loadBookings();
         loadBlocked();
-        setInterval(()=>{loadBookings();loadBlocked();}, 60000);
+        loadAllBookings(); // Load all bookings for search
+        setInterval(()=>{loadBookings();loadBlocked();loadAllBookings();}, 60000);
     </script>
 </body>
 </html>
