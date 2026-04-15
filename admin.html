@@ -451,43 +451,56 @@
         }
         
         async function searchBookings() {
-            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
-            const searchMonth = document.getElementById('searchMonth').value; // Format: YYYY-MM
-            const showPast = document.getElementById('showPast').checked;
-            const showUpcoming = document.getElementById('showUpcoming').checked;
-            
-            if (allBookingsCache.length === 0) {
-                await loadAllBookings();
+            try {
+                console.log('🔍 Search triggered');
+                const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+                const searchMonth = document.getElementById('searchMonth').value; // Format: YYYY-MM
+                const showPast = document.getElementById('showPast').checked;
+                const showUpcoming = document.getElementById('showUpcoming').checked;
+                
+                console.log('Search params:', {searchQuery, searchMonth, showPast, showUpcoming});
+                
+                if (allBookingsCache.length === 0) {
+                    console.log('Cache empty, loading all bookings...');
+                    await loadAllBookings();
+                }
+                
+                console.log(`Total bookings in cache: ${allBookingsCache.length}`);
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                let results = allBookingsCache.filter(b => {
+                    // Date filter
+                    const bookingDate = new Date(b.date + 'T00:00:00');
+                    const isPast = bookingDate < today;
+                    const isUpcoming = bookingDate >= today;
+                    
+                    if (!showPast && isPast) return false;
+                    if (!showUpcoming && isUpcoming) return false;
+                    
+                    // Month filter
+                    if (searchMonth) {
+                        const bookingMonth = b.date.substring(0, 7); // Get YYYY-MM
+                        console.log(`Comparing ${bookingMonth} with ${searchMonth}`);
+                        if (bookingMonth !== searchMonth) return false;
+                    }
+                    
+                    // Text search
+                    if (searchQuery) {
+                        const searchText = `${b.ownerName} ${b.dogName} ${b.phone} ${b.email} ${b.breed} ${b.date}`.toLowerCase();
+                        if (!searchText.includes(searchQuery)) return false;
+                    }
+                    
+                    return true;
+                });
+                
+                console.log(`Found ${results.length} matching bookings`);
+                displaySearchResults(results);
+            } catch (error) {
+                console.error('❌ Search error:', error);
+                document.getElementById('searchResults').innerHTML = `<p style="color:#c62828;padding:2rem;">Error: ${error.message}</p>`;
             }
-            
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            
-            let results = allBookingsCache.filter(b => {
-                // Date filter
-                const bookingDate = new Date(b.date + 'T00:00:00');
-                const isPast = bookingDate < today;
-                const isUpcoming = bookingDate >= today;
-                
-                if (!showPast && isPast) return false;
-                if (!showUpcoming && isUpcoming) return false;
-                
-                // Month filter
-                if (searchMonth) {
-                    const bookingMonth = b.date.substring(0, 7); // Get YYYY-MM
-                    if (bookingMonth !== searchMonth) return false;
-                }
-                
-                // Text search
-                if (searchQuery) {
-                    const searchText = `${b.ownerName} ${b.dogName} ${b.phone} ${b.email} ${b.breed} ${b.date}`.toLowerCase();
-                    if (!searchText.includes(searchQuery)) return false;
-                }
-                
-                return true;
-            });
-            
-            displaySearchResults(results);
         }
         
         function displaySearchResults(results) {
@@ -540,6 +553,10 @@
             document.getElementById('searchResults').innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Enter search term or select a month to find bookings</p>';
             document.getElementById('searchStats').style.display = 'none';
         }
+        
+        // Make search functions globally accessible
+        window.searchBookings = searchBookings;
+        window.clearSearch = clearSearch;
         
         loadBookings();
         loadBlocked();
