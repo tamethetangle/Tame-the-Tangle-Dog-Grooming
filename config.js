@@ -40,9 +40,9 @@ const CONFIG = {
     // Pricing
     pricing: {
         depositAmount: 30, // Non-refundable deposit (part of total, not added)
-        small: 40,
-        medium: 60,
-        large: 80,
+        small: 60,
+        medium: 80,
+        large: 100,
         addons: {
             medicated: 10,
             conditioning: 10,

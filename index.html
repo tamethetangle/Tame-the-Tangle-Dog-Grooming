@@ -805,9 +805,169 @@
                 gap: 0.5rem;
             }
         }
+
+        /* Announcement Banner */
+        .announcement-banner {
+            background: linear-gradient(135deg, #fce7f3 0%, #ddd6fe 100%);
+            border-bottom: 3px solid #a78bfa;
+            padding: 1rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 999;
+        }
+
+        .announcement-banner p {
+            color: #4c1d95;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0.2rem 0;
+        }
+
+        .announcement-banner .ann-prices {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .announcement-banner .ann-price-item {
+            background: white;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-weight: bold;
+            color: #ec4899;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(167,139,250,0.2);
+        }
+
+        .announcement-banner .ann-note {
+            font-size: 0.88rem;
+            color: #6d28d9;
+            margin-top: 0.3rem;
+        }
+
+        /* Mobile Grooming Coming Soon Section */
+        .mobile-grooming {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+            color: white;
+            padding: 5rem 2rem;
+        }
+
+        .mobile-grooming .section-title {
+            color: white;
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899, #a78bfa);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .mobile-pricing-card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 1.8rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .mobile-pricing-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.14);
+        }
+
+        .mobile-pricing-card h3 {
+            color: #c4b5fd;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .mobile-price {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #f9a8d4;
+            margin-bottom: 0.3rem;
+        }
+
+        .mobile-includes {
+            font-size: 0.85rem;
+            color: #c4b5fd;
+            margin-top: 0.5rem;
+        }
+
+        .mobile-addons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        .mobile-addon-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.3rem 1.5rem;
+        }
+
+        .mobile-addon-card h4 {
+            color: #e879f9;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .mobile-addon-card p {
+            font-size: 0.88rem;
+            color: #e0e7ff;
+            margin: 0.25rem 0;
+        }
+
+        .mobile-notes {
+            background: rgba(255,255,255,0.06);
+            border-left: 4px solid #a78bfa;
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #c4b5fd;
+        }
+
+        .mobile-notes p {
+            margin: 0.3rem 0;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Announcement Banner -->
+    <div class="announcement-banner">
+        <p>🐾 <strong>Pricing Update – Tame the Tangle Dog Grooming</strong> 🐾</p>
+        <p style="font-size:0.9rem; color:#6d28d9; margin-bottom:0.5rem;">To continue providing high-quality, one-on-one care for your pups, updated pricing is as follows:</p>
+        <div class="ann-prices">
+            <span class="ann-price-item">🐶 Small Dogs: $60</span>
+            <span class="ann-price-item">🐶 Medium Dogs: $80</span>
+            <span class="ann-price-item">🐶 Large Dogs: $100</span>
+        </div>
+        <p class="ann-note">💵 $10 discount available for cash payments &nbsp;|&nbsp; 🚗 In-home service includes a travel fee starting at $10 (based on location)</p>
+        <p class="ann-note" style="margin-top:0.4rem;">Thank you so much for supporting a small, growing business 💛</p>
+    </div>
+
     <header>
         <nav>
           
@@ -842,8 +1002,8 @@
             <div class="pricing-grid">
                 <div class="pricing-card">
                     <h3>Small Dogs</h3>
-                    <div class="price">$40+</div>
-                    <p class="price-note">Starting price | 2 hour appointment</p>
+                    <div class="price">$60</div>
+                    <p class="price-note">2 hour appointment</p>
                     <ul class="service-list">
                         <li>Bath & Blow Dry</li>
                         <li>Haircut & Styling</li>
@@ -856,8 +1016,8 @@
 
                 <div class="pricing-card">
                     <h3>Medium Dogs</h3>
-                    <div class="price">$60+</div>
-                    <p class="price-note">Starting price | 2 hour appointment</p>
+                    <div class="price">$80</div>
+                    <p class="price-note">2 hour appointment</p>
                     <ul class="service-list">
                         <li>Bath & Blow Dry</li>
                         <li>Haircut & Styling</li>
@@ -870,8 +1030,8 @@
 
                 <div class="pricing-card">
                     <h3>Large Dogs</h3>
-                    <div class="price">$80+</div>
-                    <p class="price-note">Starting price | 3 hour appointment</p>
+                    <div class="price">$100</div>
+                    <p class="price-note">3 hour appointment</p>
                     <ul class="service-list">
                         <li>Bath & Blow Dry</li>
                         <li>Haircut & Styling</li>
@@ -903,6 +1063,68 @@
                         <div class="addon-price">+$10</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOBILE GROOMING COMING SOON SECTION -->
+    <section class="mobile-grooming">
+        <div class="container" style="text-align:center;">
+            <div class="coming-soon-badge">🚐 Coming Soon</div>
+            <h2 class="section-title">Mobile Grooming</h2>
+            <p style="color:#c4b5fd; max-width:650px; margin:0 auto 1rem; font-size:1.05rem;">
+                Enjoy a full grooming experience right at your doorstep — no travel, no mess, just one-on-one care for your pup. 🐾
+            </p>
+
+            <div class="mobile-pricing-grid">
+                <div class="mobile-pricing-card">
+                    <h3>Small Dogs</h3>
+                    <div class="mobile-price">$130</div>
+                    <p class="mobile-includes">Bath · blow dry · nail trim · ear cleaning · full basic groom</p>
+                </div>
+                <div class="mobile-pricing-card">
+                    <h3>Medium Dogs</h3>
+                    <div class="mobile-price">$150</div>
+                    <p class="mobile-includes">Bath · blow dry · nail trim · ear cleaning · full basic groom</p>
+                </div>
+                <div class="mobile-pricing-card">
+                    <h3>Large Dogs</h3>
+                    <div class="mobile-price">$170</div>
+                    <p class="mobile-includes">Bath · blow dry · nail trim · ear cleaning · full basic groom</p>
+                </div>
+            </div>
+
+            <h3 style="color:#e879f9; margin-top:2rem; margin-bottom:1rem; font-size:1.3rem;">➕ Add-On Services</h3>
+
+            <div class="mobile-addons-grid">
+                <div class="mobile-addon-card">
+                    <h4>🧶 Deshedding Treatment</h4>
+                    <p>Adds approx. +1 hour grooming time</p>
+                    <p>Small Dogs: +$15–$25</p>
+                    <p>Medium Dogs: +$20–$35</p>
+                    <p>Large Dogs: +$30–$50</p>
+                    <p style="font-size:0.8rem; color:#a5b4fc; margin-top:0.5rem;">Price depends on coat density & shedding level</p>
+                </div>
+                <div class="mobile-addon-card">
+                    <h4>🪮 Matting / Heavy Coat Work</h4>
+                    <p>Light matting: +$10–$20</p>
+                    <p>Moderate matting: +$20–$35</p>
+                    <p>Severe matting / shave-down: +$35+</p>
+                    <p style="font-size:0.8rem; color:#a5b4fc; margin-top:0.5rem;">Charged based on time, condition & difficulty</p>
+                </div>
+                <div class="mobile-addon-card">
+                    <h4>🐕 Temperament / Behavior Fee</h4>
+                    <p>Mild anxiety: +$10</p>
+                    <p>Difficult handling / extra restraint: +$15–$25</p>
+                    <p>Aggressive / bite-risk handling: +$25+</p>
+                    <p style="font-size:0.8rem; color:#a5b4fc; margin-top:0.5rem;">Charged for safety, time & handling complexity</p>
+                </div>
+            </div>
+
+            <div class="mobile-notes">
+                <p>💡 Pricing may adjust based on coat condition, behavior, and size</p>
+                <p>💡 All pets are assessed at appointment for final pricing</p>
+                <p>💡 Safety and comfort always come first</p>
             </div>
         </div>
     </section>
