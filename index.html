@@ -839,9 +839,10 @@
         <div class="container">
             <h2 class="section-title">Services & Pricing</h2>
             
-            <div class="pricing-grid">
+            <div class="pricing-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
                 <div class="pricing-card">
-                    <h3>Small Dogs</h3>
+                    <h3>XS Dogs</h3>
+                    <p style="font-size: 0.85rem; color: #999; margin: 0 0 0.5rem;">Under 10 lbs</p>
                     <div class="price">$40+</div>
                     <p class="price-note">Starting price | 2 hour appointment</p>
                     <ul class="service-list">
@@ -853,9 +854,9 @@
                     </ul>
                     <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
                 </div>
-
                 <div class="pricing-card">
-                    <h3>Medium Dogs</h3>
+                    <h3>Small Dogs</h3>
+                    <p style="font-size: 0.85rem; color: #999; margin: 0 0 0.5rem;">10–30 lbs</p>
                     <div class="price">$60+</div>
                     <p class="price-note">Starting price | 2 hour appointment</p>
                     <ul class="service-list">
@@ -867,10 +868,24 @@
                     </ul>
                     <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
                 </div>
-
+                <div class="pricing-card">
+                    <h3>Medium Dogs</h3>
+                    <p style="font-size: 0.85rem; color: #999; margin: 0 0 0.5rem;">30–50 lbs</p>
+                    <div class="price">$80+</div>
+                    <p class="price-note">Starting price | 2 hour appointment</p>
+                    <ul class="service-list">
+                        <li>Bath & Blow Dry</li>
+                        <li>Haircut & Styling</li>
+                        <li>Nail Trim & File</li>
+                        <li>Ear Cleaning</li>
+                        <li>Sanitary Trim</li>
+                    </ul>
+                    <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
+                </div>
                 <div class="pricing-card">
                     <h3>Large Dogs</h3>
-                    <div class="price">$80+</div>
+                    <p style="font-size: 0.85rem; color: #999; margin: 0 0 0.5rem;">50–80 lbs</p>
+                    <div class="price">$100+</div>
                     <p class="price-note">Starting price | 3 hour appointment</p>
                     <ul class="service-list">
                         <li>Bath & Blow Dry</li>
@@ -882,17 +897,15 @@
                     <p style="font-size: 0.85rem; color: #999; margin-top: 1rem;">+1 hour if matted/temperamental</p>
                 </div>
             </div>
-
             <p style="text-align: center; color: #666; font-style: italic; margin-bottom: 2rem;">
-                *Final pricing depends on coat condition, matting, and temperament. Additional charges may apply for severely matted coats or difficult handling.
+                *All prices are starting estimates. Final price may be higher or lower depending on your dog's breed, coat type, condition, and temperament. Additional charges may apply for severely matted coats or difficult handling.
             </p>
-
             <div class="addons">
                 <h3>Add-On Services</h3>
                 <div class="addon-grid">
                     <div class="addon-item">
                         <div>💊 Medicated Bath</div>
-                        <div class="addon-price">+$10</div>
+                        <div class="addon-price">+$5</div>
                     </div>
                     <div class="addon-item">
                         <div>✨ Deep Conditioning</div>
@@ -900,7 +913,7 @@
                     </div>
                     <div class="addon-item">
                         <div>🐜 Flea Bath</div>
-                        <div class="addon-price">+$10</div>
+                        <div class="addon-price">+$5</div>
                     </div>
                 </div>
             </div>
@@ -1047,9 +1060,10 @@
                     <label><span id="sizeLabel">Dog Size</span> *</label>
                     <select name="size" id="dogSize" required onchange="updateAppointmentDuration()">
                         <option value="">Select size</option>
-                        <option value="small" data-hours="2">Small (Under 20 lbs) - $40+ (2 hour appointment)</option>
-                        <option value="medium" data-hours="2">Medium (20-50 lbs) - $60+ (2 hour appointment)</option>
-                        <option value="large" data-hours="3">Large (Over 50 lbs) - $80+ (3 hour appointment)</option>
+                        <option value="xs" data-hours="2">XS (Under 10 lbs) - $40+ (2 hour appointment)</option>
+                        <option value="small" data-hours="2">Small (10-30 lbs) - $60+ (2 hour appointment)</option>
+                        <option value="medium" data-hours="2">Medium (30-50 lbs) - $80+ (2 hour appointment)</option>
+                        <option value="large" data-hours="3">Large (50-80 lbs) - $100+ (3 hour appointment)</option>
                     </select>
                 </div>
 
@@ -1128,7 +1142,7 @@
                     <label>Add-ons (Optional)</label>
                     <div class="checkbox-label">
                         <input type="checkbox" name="addon" value="medicated">
-                        Medicated Bath (+$10)
+                        Medicated Bath (+$5)
                     </div>
                     <div class="checkbox-label">
                         <input type="checkbox" name="addon" value="conditioning">
@@ -1136,7 +1150,7 @@
                     </div>
                     <div class="checkbox-label">
                         <input type="checkbox" name="addon" value="flea">
-                        Flea Bath (+$10)
+                        Flea Bath (+$5)
                     </div>
                 </div>
 
@@ -1206,12 +1220,76 @@
             <div style="background: #e3f2fd; padding: 2rem; border-radius: 12px; margin-top: 3rem; text-align: center; border: 2px solid #2196f3;">
                 <h3 style="color: #1976d2; margin-bottom: 1rem;">📋 Can't Find an Available Time?</h3>
                 <p style="color: #0d47a1; margin-bottom: 1.5rem;">
-                    Join our waitlist! I'll notify you when spots open up or if there are any cancellations.
+                    Join our waitlist! We'll reach out when a spot opens up or if there's a cancellation.
                 </p>
-                <a href="/cdn-cgi/l/email-protection#b2c6d3dfd7c6dad7c6d3dcd5ded7d6ddd5d5c0dddddfdbdcd5f2d5dfd3dbde9cd1dddf8dc1c7d0d8d7d1c68fe5d3dbc6dedbc1c692e0d7c3c7d7c1c694d0ddd6cb8fe2ded7d3c1d792d3d6d692dfd792c6dd92cbddc7c092c5d3dbc6dedbc1c6939782f39782f3fcd3dfd7889782f3e2dadddcd7889782f3f6ddd592fcd3dfd7889782f3e2c0d7d4d7c0c0d7d692f6d3cbc19de6dbdfd7c188" style="display: inline-block; background: #2196f3; color: white; padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;">
-                    📧 Join the Waitlist
-                </a>
+                <div id="waitlistForm" style="max-width: 400px; margin: 0 auto;">
+                    <input type="text" id="waitlistName" placeholder="Your Name" required
+                        style="width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.75rem; border: 1px solid #90caf9; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    <input type="email" id="waitlistEmail" placeholder="Your Email" required
+                        style="width: 100%; padding: 0.75rem 1rem; margin-bottom: 0.75rem; border: 1px solid #90caf9; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    <input type="tel" id="waitlistPhone" placeholder="Your Phone (optional)"
+                        style="width: 100%; padding: 0.75rem 1rem; margin-bottom: 1rem; border: 1px solid #90caf9; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
+                    <button onclick="submitWaitlist()" 
+                        style="background: #2196f3; color: white; padding: 0.85rem 2rem; border: none; border-radius: 50px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%;">
+                        📋 Join the Waitlist
+                    </button>
+                    <p id="waitlistMsg" style="margin-top: 1rem; font-weight: bold; display: none;"></p>
+                </div>
             </div>
+
+            <script>
+            async function submitWaitlist() {
+                const name = document.getElementById('waitlistName').value.trim();
+                const email = document.getElementById('waitlistEmail').value.trim();
+                const phone = document.getElementById('waitlistPhone').value.trim();
+                const msg = document.getElementById('waitlistMsg');
+
+                if (!name || !email) {
+                    msg.style.color = '#c62828';
+                    msg.textContent = 'Please enter your name and email.';
+                    msg.style.display = 'block';
+                    return;
+                }
+
+                if (typeof emailjs === 'undefined') {
+                    msg.style.color = '#c62828';
+                    msg.textContent = 'Unable to submit right now. Please call us at 336-582-2884.';
+                    msg.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    await emailjs.send(
+                        'service_7psfawy',
+                        'template_3xhhl1m',
+                        {
+                            to_email: 'tamethetangledoggrooming@gmail.com',
+                            to_name: 'Tame the Tangle',
+                            owner_name: name,
+                            email: email,
+                            phone: phone || 'Not provided',
+                            dog_name: 'N/A - Waitlist Request',
+                            appointment_date: 'Waitlist',
+                            appointment_time: 'Waitlist',
+                            duration: 'N/A',
+                            deposit_paid: 'N/A',
+                            remaining_balance: 'N/A',
+                            estimated_total: 'N/A'
+                        }
+                    );
+                    msg.style.color = '#1b5e20';
+                    msg.textContent = "✅ You're on the waitlist! We'll be in touch soon.";
+                    msg.style.display = 'block';
+                    document.getElementById('waitlistName').value = '';
+                    document.getElementById('waitlistEmail').value = '';
+                    document.getElementById('waitlistPhone').value = '';
+                } catch (err) {
+                    msg.style.color = '#c62828';
+                    msg.textContent = 'Something went wrong. Please call us at 336-582-2884.';
+                    msg.style.display = 'block';
+                }
+            }
+            </script>
         </div>
     </section>
     </section>
@@ -1228,13 +1306,7 @@
                             336-582-2884 (Hope Ariel)
                         </div>
                     </div>
-                   <div class="contact-item">
-                        <span class="contact-icon">📧</span>
-                        <div>
-                            <strong>Email</strong><br>
-                            <a href="/cdn-cgi/l/email-protection#eb9f8a868e9f838e9f8a858c878e8f848c8c9984848682858cab8c868a8287c5888486"><span class="__cf_email__" data-cfemail="93e7f2fef6e7fbf6e7f2fdf4fff6f7fcf4f4e1fcfcfefafdf4d3f4fef2faffbdf0fcfe">[email&#160;protected]</span></a>
-                        </div>
-                    </div>
+
                     <div class="contact-item">
                         <span class="contact-icon">📍</span>
                         <div>
@@ -1246,8 +1318,7 @@
                         <span class="contact-icon">🕐</span>
                         <div>
                             <strong>Hours</strong><br>
-                            Mon-Fri: 5pm - 7pm<br>
-                            Sat: 9am - 7pm (Last booking at 5pm)<br>
+                            Mon-Sat: 9am - 7pm<br>
                             Sun: Closed
                         </div>
                     </div>
@@ -1453,12 +1524,12 @@
                 return;
             }
             else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                times = ['17:00', '18:00', '19:00'];
-                note = 'Mon-Fri hours: 5:00 PM - 7:00 PM';
+                times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+                note = '';
             }
             else if (dayOfWeek === 6) {
-                times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-                note = 'Saturday hours: 9:00 AM - 7:00 PM (Last booking at 5:00 PM)';
+                times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+                note = '';
             }
             
             const blockedTimesForDate = window.getBlockedTimesForDate ? window.getBlockedTimesForDate(selectedDateString) : [];
