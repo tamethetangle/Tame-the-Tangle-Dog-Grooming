@@ -40,9 +40,9 @@ const CONFIG = {
     // Pricing
     pricing: {
         depositAmount: 30, // Non-refundable deposit (part of total, not added)
-        small: 60,
-        medium: 80,
-        large: 100,
+        small: 40,
+        medium: 60,
+        large: 80,
         addons: {
             medicated: 10,
             conditioning: 10,
@@ -205,20 +205,55 @@ async function saveBookingToFirebase(bookingData) {
         console.log("Booking data:", bookingData);
         return { id: 'demo-' + Date.now() };
     }
-    
+
+    // Strip undefined values — Firebase rejects them and silently fails
+    const cleanData = JSON.parse(JSON.stringify(bookingData, (key, value) => 
+        value === undefined ? null : value
+    ));
+
     try {
         const docRef = await db.collection('bookings').add({
-            ...bookingData,
+            ...cleanData,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             status: 'confirmed'
         });
-        
+
         // Automatically block all time slots for the appointment duration
         await blockAppointmentTimeSlots(bookingData.date, bookingData.time, bookingData.duration, docRef.id);
-        
+
         return { id: docRef.id };
     } catch (error) {
-        console.error("Firebase error:", error);
+        console.error("Firebase save failed:", error);
+
+        // Emergency fallback — send yourself an email with all booking details
+        // so the booking is never completely lost even if Firebase is down
+        try {
+            if (typeof emailjs !== 'undefined') {
+                await emailjs.send(
+                    CONFIG.emailjs.serviceId,
+                    CONFIG.emailjs.templates.notification,
+                    {
+                        to_email: 'tamethetangledoggrooming@gmail.com',
+                        to_name: 'Tame the Tangle',
+                        owner_name: cleanData.ownerName || 'Unknown',
+                        email: cleanData.email || 'Unknown',
+                        dog_name: cleanData.dogName || cleanData.petName || 'Unknown',
+                        appointment_date: cleanData.date || 'Unknown',
+                        appointment_time: cleanData.time || 'Unknown',
+                        duration: cleanData.duration || 'Unknown',
+                        deposit_paid: cleanData.depositAmount || '30',
+                        remaining_balance: cleanData.balanceDue || 'Unknown',
+                        estimated_total: cleanData.estimatedCost || 'Unknown',
+                        phone: cleanData.phone || 'Not provided',
+                        subject: '⚠️ URGENT: Payment taken but booking failed to save - ' + (cleanData.ownerName || 'Unknown client')
+                    }
+                );
+                console.log('✅ Emergency notification email sent');
+            }
+        } catch (emailErr) {
+            console.error('Emergency email also failed:', emailErr);
+        }
+
         throw error;
     }
 }
@@ -535,7 +570,7 @@ We look forward to pampering ${data.petName}!`);
         
         // Check if payment already went through
         if (data.paymentIntentId) {
-            alert('⚠️ Payment was processed successfully, but there was an error completing your booking.\n\n💳 Deposit charged: $' + depositAmount + '\nPayment ID: ' + data.paymentIntentId + '\n\nPlease call us at 336-582-2884 to confirm your appointment.\nYour payment will not be charged again.');
+            alert('✅ Your payment of $' + depositAmount + ' was received successfully!\n\n⚠️ However we had a technical issue saving your booking details. You WILL NOT be charged again.\n\nWe have been notified and will contact you at ' + (data.email || 'your email') + ' or ' + (data.phone || 'your phone') + ' within 24 hours to confirm your appointment.\n\nPayment ID (save this): ' + data.paymentIntentId + '\n\nIf you need immediate help call: 336-582-2884');
         } else {
             alert('Error processing booking: ' + error.message + '\n\nYour card was not charged. Please try again or call 336-582-2884');
         }
@@ -628,19 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeStripe();
     initializeFirebase();
-    
-    // Retry EmailJS init in case CDN script hasn't loaded yet
-    function tryInitEmailJS(attempts) {
-        attempts = attempts || 0;
-        if (typeof emailjs !== 'undefined') {
-            initializeEmailJS();
-        } else if (attempts < 10) {
-            setTimeout(function() { tryInitEmailJS(attempts + 1); }, 300);
-        } else {
-            console.error('❌ EmailJS failed to load after multiple attempts. Check your internet connection or CDN.');
-        }
-    }
-    tryInitEmailJS();
+    initializeEmailJS();
     
     const dateInput = document.querySelector('input[name="date"]');
     if (dateInput) {
